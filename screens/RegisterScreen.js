@@ -36,31 +36,7 @@ const RegisterScreen = () => {
   const [passwordConf, setPasswordConf] = useState("");
   const auth = getAuth();
   const navigation = useNavigation();
-
-  const handleSignUp = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .catch((error) => {
-        alert(error.message);
-      })
-      .then(() => {
-        setDoc(doc(db, "volunteer", auth.currentUser.uid), {
-          name: name,
-        });
-      })
-      .catch((error) => {
-        alert(error.message);
-      })
-      .then(() => {
-        /*
-        sendEmailVerification(auth.currentUser, {
-          url: "https://kskfyp.firebaseapp.com",
-          handleCodeInApp: true,
-        }).catch((error) => {
-          alert(error.message);
-        });
-        */
-      });
-  };
+  var validator = require("email-validator");
 
   const checkUsername = async () => {
     const q = query(collection(db, "volunteer"), where("Username", "==", name));
@@ -115,6 +91,8 @@ const RegisterScreen = () => {
               Alert.alert("Error!", "Please fill in all fields");
             } else if (password !== passwordConf) {
               Alert.alert("Error!", "Passwords do not match");
+            } else if (!validator.validate(email)) {
+              Alert.alert("Error!", "Please enter a valid email address");
             } else {
               checkUsername();
             }
