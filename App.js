@@ -33,7 +33,7 @@ function App() {
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, onAuthStateChange);
     return unsubscribe;
-  });
+  }, []);
 
   /*
   React.useEffect(() => {

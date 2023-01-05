@@ -87,7 +87,12 @@ const RegisterScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           onPress={() => {
-            if (email === "" || password === "" || name === "") {
+            if (
+              email === "" ||
+              password === "" ||
+              name === "" ||
+              passwordConf === ""
+            ) {
               Alert.alert("Error!", "Please fill in all fields");
             } else if (password !== passwordConf) {
               Alert.alert("Error!", "Passwords do not match");

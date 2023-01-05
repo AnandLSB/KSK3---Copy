@@ -1,14 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 
-const Test = () => {
+const ForumScreen = () => {
   return (
     <View>
-      <Text>test</Text>
+      <Text>ForumScreen</Text>
     </View>
   );
 };
 
-export default Test;
+export default ForumScreen;
 
 const styles = StyleSheet.create({});
