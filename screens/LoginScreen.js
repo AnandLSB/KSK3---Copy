@@ -11,6 +11,7 @@ import {
   View,
   Alert,
 } from "react-native";
+import { auth } from "../config/firebase";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 
