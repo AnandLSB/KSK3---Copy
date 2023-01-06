@@ -1,10 +1,9 @@
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from "firebase/auth";
 import {
-  KeyboardAvoidingView,
   StyleSheet,
   Text,
   TextInput,
@@ -12,10 +11,7 @@ import {
   View,
   Alert,
 } from "react-native";
-import { auth } from "../config/firebase";
 import React, { useState } from "react";
-import { db } from "../config/firebase";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 
 const LoginScreen = () => {
@@ -30,8 +26,18 @@ const LoginScreen = () => {
     );
   };
 
+  const handlePassReset = () => {
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        Alert.alert("Password Reset Email Sent!", "Please check your email");
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <View style={styles.container}>
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
@@ -67,8 +73,30 @@ const LoginScreen = () => {
         >
           <Text style={styles.buttonOutlineText}>Register Account</Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            if (email === "") {
+              Alert.alert("Error!", "Please fill in your email");
+            } else {
+              Alert.alert(
+                "Are you sure?",
+                "A password reset email will be sent to your email address!",
+                [
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                  },
+                  { text: "OK", onPress: () => handlePassReset() },
+                ]
+              );
+            }
+          }}
+          style={[styles.button, styles.buttonOutline]}
+        >
+          <Text style={styles.buttonOutlineText}>Forgot Password</Text>
+        </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
