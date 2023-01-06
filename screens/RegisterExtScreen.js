@@ -51,6 +51,7 @@ const RegisterExtScreen = ({ route }) => {
           emergencyContact: emergencyContact,
           kskLocation: kskLocation,
           accountCreationDate: accountCreationDate,
+          profilePic: "",
         });
       })
       .catch((error) => {

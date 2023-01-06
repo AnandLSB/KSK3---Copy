@@ -11,65 +11,28 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { getAuth, signOut, deleteUser } from "firebase/auth";
-import { doc, getDoc, onSnapshot, deleteDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getStorage, getDownloadURL } from "firebase/storage";
+import { uuidv4 } from "@firebase/util";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const auth = getAuth();
   const [user, setUser] = useState([]);
-  const [userArr, setUserArr] = useState([]);
+  const [uploading, setUploading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const docRef = doc(db, "volunteer", auth.currentUser?.uid);
 
   async function getUser() {
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setUser(docSnap.data());
-      setUserArr([docSnap.data()]);
-      if (initializing) setInitializing(false);
-    } else {
-      console.log("No such document!");
-    }
-  }
-
-  async function getUser2() {
-    onSnapshot(docRef, (doc) => {
-      const users = [];
-
-      const {
-        Username,
-        accountCreationDate,
-        birthdate,
-        emergencyContact,
-        fullName,
-        homeAddress,
-        icNumber,
-        kskLocation,
-        nationality,
-        phoneNumber,
-      } = doc.data();
-
-      users.push({
-        Username,
-        accountCreationDate,
-        birthdate,
-        emergencyContact,
-        fullName,
-        homeAddress,
-        icNumber,
-        kskLocation,
-        nationality,
-        phoneNumber,
-      });
-      setUser(users);
-    });
-
-    if (initializing) setInitializing(false);
-  }
-
-  async function getUser3() {
     onSnapshot(docRef, (doc) => {
       setUser(doc.data());
       if (initializing) setInitializing(false);
@@ -77,7 +40,7 @@ const ProfileScreen = () => {
   }
 
   useEffect(() => {
-    getUser3();
+    getUser();
   }, []);
 
   const handleDelete = async () => {
@@ -99,16 +62,60 @@ const ProfileScreen = () => {
       });
   };
 
-  /*
-  const userList = Object.keys(user).map((key) => {
-    //{ key: key, value: user[key] };
-    return (
-      <Text key={key}>
-        {key} : {user[key]}
-      </Text>
-    );
-  });
-  */
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    _handleImagePicked(result);
+  };
+
+  const _handleImagePicked = async (result) => {
+    try {
+      setUploading(true);
+
+      if (!result.canceled) {
+        await uploadImageAsync(result.assets[0].uri);
+      }
+    } catch (e) {
+      console.log(e);
+      alert("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  async function uploadImageAsync(uri) {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob";
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+
+    const fileRef = ref(getStorage(), uuidv4());
+    await uploadBytes(fileRef, blob).then(() => {
+      Alert.alert("Success", "Your profile picture has been updated");
+    });
+
+    blob.close();
+
+    await updateDoc(docRef, {
+      profilePic: await getDownloadURL(fileRef),
+    }).catch((error) => {
+      alert("Error updating document: ", error);
+    });
+  }
 
   if (initializing) {
     return (
@@ -120,12 +127,14 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
-        <Image
-          style={styles.userImg}
-          source={require("../assets/favicon.png")}
-        />
-      </View>
+      <TouchableOpacity
+        onPress={() => {
+          pickImage();
+        }}
+        style={styles.imageContainer}
+      >
+        <Image style={styles.userImg} source={{ uri: user?.profilePic }} />
+      </TouchableOpacity>
 
       <View style={styles.greetingCont}>
         <Text style={{ fontSize: 20, fontWeight: "bold" }}>
