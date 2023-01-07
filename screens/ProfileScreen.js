@@ -10,7 +10,13 @@ import {
   Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { getAuth, signOut, deleteUser } from "firebase/auth";
+import {
+  getAuth,
+  signOut,
+  deleteUser,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+} from "firebase/auth";
 import {
   doc,
   getDoc,
@@ -23,6 +29,7 @@ import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getStorage, getDownloadURL } from "firebase/storage";
 import { uuidv4 } from "@firebase/util";
+import Dialog from "react-native-dialog";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +38,12 @@ const ProfileScreen = () => {
   const [uploading, setUploading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const docRef = doc(db, "volunteer", auth.currentUser?.uid);
+  const [visible, setVisible] = useState(false);
+  const [password, setPassword] = useState("");
+  const credential = EmailAuthProvider.credential(
+    auth.currentUser.email,
+    password
+  );
 
   async function getUser() {
     onSnapshot(docRef, (doc) => {
@@ -59,6 +72,16 @@ const ProfileScreen = () => {
       .catch((error) => alert(error.message))
       .then(() => {
         Alert.alert("Account Deleted", "Your account has been deleted");
+      });
+  };
+
+  const reauthenticateUser = () => {
+    reauthenticateWithCredential(auth.currentUser, credential)
+      .catch(() => {
+        Alert.alert("Incorrect Password", "Please try again.");
+      })
+      .then(() => {
+        handleDelete();
       });
   };
 
@@ -103,7 +126,7 @@ const ProfileScreen = () => {
       xhr.send(null);
     });
 
-    const fileRef = ref(getStorage(), uuidv4());
+    const fileRef = ref(getStorage(), "profilePictures/" + uuidv4());
     await uploadBytes(fileRef, blob).then(() => {
       Alert.alert("Success", "Your profile picture has been updated");
     });
@@ -127,6 +150,27 @@ const ProfileScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View>
+        <Dialog.Container visible={visible}>
+          <Dialog.Title>Please re-enter your password to delete</Dialog.Title>
+          <Dialog.Input
+            placeholder="Password"
+            value={password}
+            onChangeText={(text) => setPassword(text)}
+            secureTextEntry={true}
+          />
+          <Dialog.Button label="Cancel" onPress={() => setVisible(false)} />
+          <Dialog.Button
+            label="Delete"
+            onPress={() => {
+              setInitializing(true);
+              setVisible(false);
+              reauthenticateUser();
+              //handleDelete();
+            }}
+          />
+        </Dialog.Container>
+      </View>
       <TouchableOpacity
         onPress={() => {
           pickImage();
@@ -229,7 +273,7 @@ const ProfileScreen = () => {
                 },
                 {
                   text: "OK",
-                  onPress: () => handleDelete(),
+                  onPress: () => setVisible(true),
                 },
               ],
               { cancelable: true }
