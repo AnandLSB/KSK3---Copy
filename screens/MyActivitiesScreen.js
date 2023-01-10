@@ -4,8 +4,9 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import React, { useEffect } from "react";
+import React, { useEffect, useCallback } from "react";
 import { db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import {
@@ -17,71 +18,101 @@ import {
   limit,
   doc,
   getDoc,
+  updateDoc,
+  arrayRemove,
 } from "firebase/firestore";
 import Card from "../components/card";
 import { format } from "date-fns";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 
 const MyActivitiesScreen = () => {
   const auth = getAuth();
+  const isFocused = useIsFocused();
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = React.useState([]);
-  const myActivitiesRef = collection(db, "volunteerParticipation");
+  const [activityInfo, setActivityInfo] = React.useState([]);
+  const [executed, setExecuted] = React.useState(false);
   const [initializing, setInitializing] = React.useState(true);
 
   useEffect(() => {
     getMyActivities();
   }, []);
 
+  async function leaveActivity(activityId) {
+    await updateDoc(userRef, {
+      myActivities: arrayRemove(activityId),
+    })
+      .then(() => {
+        Alert.alert("Activity Left!");
+      })
+      .catch((error) => {
+        console.error("Error removing document: ", error);
+      });
+
+    console.log(activityId);
+  }
+
   const getMyActivities = async () => {
-    setMyActivity([]);
+    const userRef = doc(db, "volunteer", auth.currentUser.uid);
+    const docSnap = await getDoc(userRef);
 
-    const qMy = query(
-      myActivitiesRef,
-      where("volunteerId", "==", auth.currentUser.uid)
-    );
-    //TODO: implement check if the user has no activities?
-    const querySnapshotMy = await getDocs(qMy);
+    if (docSnap.get("myActivities") != null) {
+      console.log(docSnap.data().myActivities);
 
-    var dateTime;
-    var activity = {};
+      setMyActivity(docSnap.data().myActivities);
+      getActivityInfo();
 
-    //retrieving the users activities
-    querySnapshotMy.forEach((docMy) => {
-      console.log(docMy.id, " => ", docMy.data());
+      if (initializing) setInitializing(false);
+    }
+    //TODO: Handle if the user has no activities, maybe display no activities
+  };
 
-      let activityRef = docMy.data().activityId;
+  const getActivityInfo = async () => {
+    setActivityInfo([]);
+
+    myActivity.forEach((item) => {
+      let activityRef = item;
       let docRef = doc(db, "activities", activityRef);
+
+      var activity = {};
+      var dateTime;
+
       const docSnap = getDoc(docRef).then((doc) => {
         if (doc.exists()) {
-          console.log("Document data:", doc.data());
-
           dateTime = doc.data().activityDatetime.toDate();
 
           activity = doc.data();
           activity.activityDatetime = dateTime;
           activity.id = doc.id;
 
-          setMyActivity((myActivity) => [...myActivity, activity]);
+          setActivityInfo((activityInfo) => [...activityInfo, activity]);
         }
       });
     });
-
-    if (initializing) setInitializing(false);
   };
 
+  if (isFocused) {
+    if (!executed) {
+      getMyActivities();
+      setExecuted(true);
+    }
+  }
+
   //sorting dates according to the nearest
-  myActivity.sort(function (a, b) {
+  activityInfo.sort(function (a, b) {
     return (
       new Date(a.activityDatetime.toDateString()).getTime() -
       new Date(b.activityDatetime.toDateString()).getTime()
     );
   });
-  console.log(myActivity);
+
+  console.log(activityInfo);
 
   return (
     <View style={styles.container}>
       <Text>MyActivitiesScreen</Text>
       <FlatList
-        data={myActivity}
+        data={activityInfo}
         renderItem={({ item }) => (
           <Card>
             <Text>{item.activityName}</Text>
@@ -89,13 +120,10 @@ const MyActivitiesScreen = () => {
             <TouchableOpacity
               key={item.id}
               onPress={() => {
-                //function to register join goes here
-                navigation.navigate("ActivityDetails", {
-                  id: item.id,
-                });
+                leaveActivity(item.id);
               }}
             >
-              <Text style={styles.buttonOutlineText}>Check In</Text>
+              <Text style={styles.buttonOutlineText}>Cancel</Text>
             </TouchableOpacity>
           </Card>
         )}

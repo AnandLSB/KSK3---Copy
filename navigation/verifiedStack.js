@@ -60,7 +60,6 @@ const VerifiedStack = () => {
         <Stack.Screen name={"EditPassword"} component={EditPasswordScreen} />
         <Stack.Screen name={"AllActivities"} component={AllActivitiesScreen} />
         <Stack.Screen name={"ActivityDetails"} component={Test} />
-        <Stack.Screen name={"MyActivities"} component={MyActivitiesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -8,6 +8,7 @@ import {
   View,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from "react-native";
 import {
   collection,
@@ -15,15 +16,20 @@ import {
   where,
   getDocs,
   orderBy,
-  limit,
+  documentId,
+  updateDoc,
+  arrayUnion,
+  increment,
+  doc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
 
 const AllActivitiesScreen = () => {
+  const auth = getAuth();
   const activitiesRef = collection(db, "activities");
-  const navigation = useNavigation();
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [activities, setActivities] = React.useState([]);
   const [initializing, setInitializing] = React.useState(true);
 
@@ -63,6 +69,40 @@ const AllActivitiesScreen = () => {
     if (initializing) setInitializing(false);
   };
 
+  async function joinActivity(activityId) {
+    const collRef = collection(db, "volunteer");
+
+    //check if user has already joined the activity
+    const q = query(
+      collRef,
+      where(documentId(), "==", auth.currentUser.uid),
+      where("myActivities", "array-contains", activityId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      await updateDoc(userRef, {
+        myActivities: arrayUnion(activityId),
+      })
+        .then(() => {
+          updateDoc(doc(db, "activities", activityId), {
+            volunteerSlot: increment(-1),
+          })
+            .catch((error) => {
+              console.error("Error updating document: ", error);
+            })
+            .then(() => {
+              Alert.alert("You have successfully joined the activity!");
+            });
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+        });
+    } else {
+      Alert.alert("You have already joined this activity!");
+    }
+  }
+
   console.log(activities);
 
   if (initializing) {
@@ -85,10 +125,7 @@ const AllActivitiesScreen = () => {
             <TouchableOpacity
               key={item.id}
               onPress={() => {
-                //function to register join goes here
-                navigation.navigate("ActivityDetails", {
-                  id: item.id,
-                });
+                joinActivity(item.id);
               }}
             >
               <Text style={styles.buttonOutlineText}>Join</Text>

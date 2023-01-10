@@ -8,6 +8,7 @@ import {
   View,
   ActivityIndicator,
   FlatList,
+  Alert,
 } from "react-native";
 import {
   collection,
@@ -18,21 +19,28 @@ import {
   limit,
   doc,
   getDoc,
+  documentId,
+  updateDoc,
+  increment,
+  arrayUnion,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
+
+//Uncomment the line below to reproduce error
+//import { joinActivity } from "../components/activityFunc";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const auth = getAuth();
   const allActivitiesRef = collection(db, "activities");
   const myActivitiesRef = collection(db, "volunteerParticipation");
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
   const [initializing, setInitializing] = React.useState(true);
-  const [allActivity, setActivity] = React.useState({});
+  const [allActivity, setActivity] = React.useState([]);
   const [myActivity, setMyActivity] = React.useState([]);
-  const [activityDate, setActivityDate] = React.useState();
 
   useEffect(() => {
     getActivities();
@@ -40,9 +48,13 @@ const HomeScreen = () => {
 
   const getActivities = async () => {
     setMyActivity([]);
+    setActivity([]);
 
+    //only activities that are not full are retrieved
     const qAll = query(
       allActivitiesRef,
+      where("volunteerSlot", ">", 0),
+      orderBy("volunteerSlot", "desc"),
       orderBy("createdAt", "desc"),
       limit(1)
     );
@@ -55,24 +67,34 @@ const HomeScreen = () => {
     const querySnapshotAll = await getDocs(qAll);
     const querySnapshotMy = await getDocs(qMy);
 
+    var allDateTime;
+    var allAct = {};
+
     querySnapshotAll.forEach((docAll) => {
       console.log(docAll.id, " => ", docAll.data());
-      setActivity(docAll.data());
 
-      setActivityDate(docAll.data().activityDatetime.toDate());
+      console.log(docAll.data().volunteerSlot);
+
+      allDateTime = docAll.data().activityDatetime.toDate();
+
+      allAct = docAll.data();
+      allAct.activityDatetime = allDateTime;
+      allAct.id = docAll.id;
+
+      setActivity((allActivity) => [...allActivity, allAct]);
     });
 
     var dateTime;
     var activity = {};
 
     querySnapshotMy.forEach((docMy) => {
-      console.log(docMy.id, " => ", docMy.data());
+      //console.log(docMy.id, " => ", docMy.data());
 
       let activityRef = docMy.data().activityId;
       let docRef = doc(db, "activities", activityRef);
       const docSnap = getDoc(docRef).then((doc) => {
         if (doc.exists()) {
-          console.log("Document data:", doc.data());
+          //console.log("Document data:", doc.data());
 
           dateTime = doc.data().activityDatetime.toDate();
 
@@ -88,7 +110,42 @@ const HomeScreen = () => {
     if (initializing) setInitializing(false);
   };
 
-  console.log(myActivity);
+  async function joinActivity(activityId) {
+    const collRef = collection(db, "volunteer");
+
+    //check if user has already joined the activity
+    const q = query(
+      collRef,
+      where(documentId(), "==", auth.currentUser.uid),
+      where("myActivities", "array-contains", activityId)
+    );
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) {
+      await updateDoc(userRef, {
+        myActivities: arrayUnion(activityId),
+      })
+        .then(() => {
+          updateDoc(doc(db, "activities", activityId), {
+            volunteerSlot: increment(-1),
+          })
+            .catch((error) => {
+              console.error("Error updating document: ", error);
+            })
+            .then(() => {
+              Alert.alert("You have successfully joined the activity!");
+            });
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+        });
+    } else {
+      Alert.alert("You have already joined this activity!");
+    }
+  }
+
+  //console.log(myActivity);
+  //console.log(allActivity);
 
   if (initializing) {
     return (
@@ -114,20 +171,30 @@ const HomeScreen = () => {
           <Text style={styles.buttonOutlineText}>View All</Text>
         </TouchableOpacity>
       </View>
-      <Card>
-        <View style={styles.infoCont}>
-          <Text style={{ fontWeight: "bold" }}>{allActivity.activityName}</Text>
-          <Text>Date: {format(activityDate, "dd MMM yyyy")}</Text>
-          <Text>Time: {format(activityDate, "p")}</Text>
-          <Text>Volunteer Slots: {allActivity.volunteerSlot}</Text>
-          <Text>Category: {allActivity.activityCategory}</Text>
-        </View>
-        <View style={styles.buttonCont}>
-          <TouchableOpacity>
-            <Text style={styles.buttonOutlineText}>Join</Text>
-          </TouchableOpacity>
-        </View>
-      </Card>
+      {/*TODO: Restructure activities to show start date and end date, same for time */}
+      <FlatList
+        data={allActivity}
+        renderItem={({ item }) => (
+          <Card>
+            <View style={styles.infoCont}>
+              <Text style={{ fontWeight: "bold" }}>{item.activityName}</Text>
+              <Text>Date: {format(item.activityDatetime, "dd MMM yyyy")}</Text>
+              <Text>Time: {format(item.activityDatetime, "p")}</Text>
+              <Text>Volunteer Slots: {item.volunteerSlot}</Text>
+              <Text>Category: {item.activityCategory}</Text>
+            </View>
+            <View style={styles.buttonCont}>
+              <TouchableOpacity
+                onPress={() => {
+                  joinActivity(item.id);
+                }}
+              >
+                <Text style={styles.buttonOutlineText}>Join</Text>
+              </TouchableOpacity>
+            </View>
+          </Card>
+        )}
+      />
 
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>My Upcoming Activities</Text>
