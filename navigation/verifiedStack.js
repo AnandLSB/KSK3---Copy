@@ -11,6 +11,8 @@ import Test from "../screens/test";
 import ForumScreen from "../screens/ForumScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
 import EditPasswordScreen from "../screens/EditPasswordScreen";
+import AllActivitiesScreen from "../screens/AllActivitiesScreen";
+import MyActivitiesScreen from "../screens/MyActivitiesScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -20,7 +22,7 @@ function TabsTop() {
   return (
     <TabTop.Navigator>
       <TabTop.Screen name="My Profile" component={ProfileScreen} />
-      <TabTop.Screen name="My Activities" component={Test} />
+      <TabTop.Screen name="My Activities" component={MyActivitiesScreen} />
       <TabTop.Screen name="My Forums" component={Test} />
     </TabTop.Navigator>
   );
@@ -56,6 +58,9 @@ const VerifiedStack = () => {
         />
         <Stack.Screen name={"EditProfile"} component={EditProfileScreen} />
         <Stack.Screen name={"EditPassword"} component={EditPasswordScreen} />
+        <Stack.Screen name={"AllActivities"} component={AllActivitiesScreen} />
+        <Stack.Screen name={"ActivityDetails"} component={Test} />
+        <Stack.Screen name={"MyActivities"} component={MyActivitiesScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

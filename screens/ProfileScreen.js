@@ -166,7 +166,6 @@ const ProfileScreen = () => {
               setInitializing(true);
               setVisible(false);
               reauthenticateUser();
-              //handleDelete();
             }}
           />
         </Dialog.Container>

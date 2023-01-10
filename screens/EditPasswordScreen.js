@@ -54,7 +54,9 @@ const EditPasswordScreen = () => {
           value={currPassword}
           onChangeText={(text) => setCurrPassword(text)}
           onBlur={() => {
-            reauthenticateUser();
+            if (currPassword !== "") {
+              reauthenticateUser();
+            }
           }}
           style={styles.input}
           secureTextEntry
