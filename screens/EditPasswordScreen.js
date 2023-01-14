@@ -12,6 +12,7 @@ import {
   reauthenticateWithCredential,
   EmailAuthProvider,
   updatePassword,
+  updateEmail,
 } from "firebase/auth";
 import { useNavigation, StackActions } from "@react-navigation/native";
 
@@ -21,7 +22,9 @@ const EditPasswordScreen = () => {
   const [currPassword, setCurrPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
   const [confirmNewPassword, setConfirmNewPassword] = React.useState("");
+  const [email, setEmail] = React.useState(auth.currentUser?.email);
   const navigation = useNavigation();
+  var validator = require("email-validator");
 
   const credential = EmailAuthProvider.credential(user.email, currPassword);
 
@@ -34,7 +37,7 @@ const EditPasswordScreen = () => {
     });
   };
 
-  const handleUpdate = () => {
+  const handleUpdatePassword = () => {
     updatePassword(user, newPassword)
       .catch(() => {
         Alert.alert("Error", "Failed to update password");
@@ -45,10 +48,28 @@ const EditPasswordScreen = () => {
       });
   };
 
+  const handleUpdateEmail = () => {
+    updateEmail(user, email)
+      .catch(() => {
+        Alert.alert("Error", "Failed to update email");
+      })
+      .then(() => {
+        Alert.alert("Success", "Email updated successfully");
+        navigation.dispatch(StackActions.pop(1));
+      });
+  };
+
   return (
     <View style={styles.container}>
+      <Text>Edit Email</Text>
       <View style={styles.inputContainer}>
-        <Text>EditPasswordScreen</Text>
+        <TextInput
+          placeholder={email}
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          style={styles.input}
+        />
+        <Text>Edit Password</Text>
         <TextInput
           placeholder="Current Password"
           value={currPassword}
@@ -81,6 +102,20 @@ const EditPasswordScreen = () => {
         <TouchableOpacity
           style={[styles.button, styles.buttonOutline]}
           onPress={() => {
+            if (email === "") {
+              Alert.alert("Error!", "Please fill in email field");
+            } else if (!validator.validate(email)) {
+              Alert.alert("Error!", "Please enter a valid email");
+            } else {
+              handleUpdateEmail();
+            }
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Update Email</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonOutline]}
+          onPress={() => {
             if (
               currPassword === "" ||
               newPassword === "" ||
@@ -90,11 +125,11 @@ const EditPasswordScreen = () => {
             } else if (newPassword !== confirmNewPassword) {
               Alert.alert("Error!", "New passwords do not match");
             } else {
-              handleUpdate();
+              handleUpdatePassword();
             }
           }}
         >
-          <Text style={styles.buttonOutlineText}>Update</Text>
+          <Text style={styles.buttonOutlineText}>Update Password</Text>
         </TouchableOpacity>
       </View>
     </View>

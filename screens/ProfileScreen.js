@@ -186,7 +186,7 @@ const ProfileScreen = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={{ fontWeight: "bold" }}>Account Information</Text>
+        <Text style={{ fontWeight: "bold" }}>Volunteer Information</Text>
         <TouchableOpacity
           onPress={() =>
             navigation.navigate("EditProfile", {
@@ -256,7 +256,7 @@ const ProfileScreen = () => {
           onPress={() => navigation.navigate("EditPassword")}
           style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonOutlineText}>Change Password</Text>
+          <Text style={styles.buttonOutlineText}>Change Password/Email</Text>
         </TouchableOpacity>
       </View>
 

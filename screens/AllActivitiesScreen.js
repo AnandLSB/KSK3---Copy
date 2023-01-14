@@ -25,6 +25,7 @@ import {
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
+import { joinActivity, checkClash } from "../components/activityFunc";
 
 const AllActivitiesScreen = () => {
   const auth = getAuth();
@@ -43,7 +44,6 @@ const AllActivitiesScreen = () => {
     const activity = [];
     var dateTime;
     querySnapshot.forEach((doc) => {
-      console.log(doc.data().activityDatetime.toDate());
       dateTime = doc.data().activityDatetime.toDate();
       const {
         activityCategory,
@@ -69,41 +69,7 @@ const AllActivitiesScreen = () => {
     if (initializing) setInitializing(false);
   };
 
-  async function joinActivity(activityId) {
-    const collRef = collection(db, "volunteer");
-
-    //check if user has already joined the activity
-    const q = query(
-      collRef,
-      where(documentId(), "==", auth.currentUser.uid),
-      where("myActivities", "array-contains", activityId)
-    );
-
-    const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) {
-      await updateDoc(userRef, {
-        myActivities: arrayUnion(activityId),
-      })
-        .then(() => {
-          updateDoc(doc(db, "activities", activityId), {
-            volunteerSlot: increment(-1),
-          })
-            .catch((error) => {
-              console.error("Error updating document: ", error);
-            })
-            .then(() => {
-              Alert.alert("You have successfully joined the activity!");
-            });
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-        });
-    } else {
-      Alert.alert("You have already joined this activity!");
-    }
-  }
-
-  console.log(activities);
+  //console.log(activities);
 
   if (initializing) {
     return (
@@ -125,7 +91,7 @@ const AllActivitiesScreen = () => {
             <TouchableOpacity
               key={item.id}
               onPress={() => {
-                joinActivity(item.id);
+                joinActivity(item.id, item);
               }}
             >
               <Text style={styles.buttonOutlineText}>Join</Text>

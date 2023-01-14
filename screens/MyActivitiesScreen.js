@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useCallback } from "react";
 import { db } from "../config/firebase";
@@ -20,14 +21,18 @@ import {
   getDoc,
   updateDoc,
   arrayRemove,
+  onSnapshot,
+  Unsubscribe,
 } from "firebase/firestore";
 import Card from "../components/card";
 import { format } from "date-fns";
 import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { leaveActivity } from "../components/activityFunc";
 
 const MyActivitiesScreen = () => {
-  const auth = getAuth();
+  console.log("MyActivitiesScreen");
   const isFocused = useIsFocused();
+  const auth = getAuth();
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = React.useState([]);
   const [activityInfo, setActivityInfo] = React.useState([]);
@@ -35,67 +40,61 @@ const MyActivitiesScreen = () => {
   const [initializing, setInitializing] = React.useState(true);
 
   useEffect(() => {
-    getMyActivities();
+    const unsubscribe = onSnapshot(userRef, (docMy) => {
+      setMyActivity([]);
+      setActivityInfo([]);
+
+      //If the user has joined any activities
+      if (docMy.data().myActivities != null) {
+        //console.log(docMy.data().myActivities);
+        setMyActivity(docMy.data().myActivities);
+
+        docMy.get("myActivities").forEach((item) => {
+          let docRef = doc(db, "activities", item);
+          var activity = {};
+          var dateTime;
+
+          getDoc(docRef).then((docInf) => {
+            if (docInf.exists()) {
+              dateTime = docInf.data().activityDatetime.toDate();
+
+              activity = docInf.data();
+              activity.Id = docInf.id;
+              activity.activityDatetime = dateTime;
+
+              setActivityInfo((activityInfo) =>
+                Array.from(new Set([...activityInfo, activity]))
+              );
+            }
+          });
+        });
+      }
+      //TODO: Handle if the user has not joined any activities
+    });
+
+    if (initializing) setInitializing(false);
+
+    return () => unsubscribe();
   }, []);
 
-  async function leaveActivity(activityId) {
-    await updateDoc(userRef, {
-      myActivities: arrayRemove(activityId),
-    })
-      .then(() => {
-        Alert.alert("Activity Left!");
-      })
-      .catch((error) => {
-        console.error("Error removing document: ", error);
-      });
+  console.log(myActivity);
+  console.log(activityInfo);
 
-    console.log(activityId);
-  }
-
-  const getMyActivities = async () => {
-    const userRef = doc(db, "volunteer", auth.currentUser.uid);
-    const docSnap = await getDoc(userRef);
-
-    if (docSnap.get("myActivities") != null) {
-      console.log(docSnap.data().myActivities);
-
-      setMyActivity(docSnap.data().myActivities);
-      getActivityInfo();
-
-      if (initializing) setInitializing(false);
-    }
-    //TODO: Handle if the user has no activities, maybe display no activities
-  };
-
-  const getActivityInfo = async () => {
-    setActivityInfo([]);
-
-    myActivity.forEach((item) => {
-      let activityRef = item;
-      let docRef = doc(db, "activities", activityRef);
-
-      var activity = {};
-      var dateTime;
-
-      const docSnap = getDoc(docRef).then((doc) => {
-        if (doc.exists()) {
-          dateTime = doc.data().activityDatetime.toDate();
-
-          activity = doc.data();
-          activity.activityDatetime = dateTime;
-          activity.id = doc.id;
-
-          setActivityInfo((activityInfo) => [...activityInfo, activity]);
-        }
-      });
-    });
-  };
-
+  /*
   if (isFocused) {
     if (!executed) {
       getMyActivities();
       setExecuted(true);
     }
+  }
+*/
+
+  if (initializing) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   //sorting dates according to the nearest
@@ -106,7 +105,7 @@ const MyActivitiesScreen = () => {
     );
   });
 
-  console.log(activityInfo);
+  //console.log(activityInfo);
 
   return (
     <View style={styles.container}>
@@ -118,9 +117,9 @@ const MyActivitiesScreen = () => {
             <Text>{item.activityName}</Text>
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
-              key={item.id}
               onPress={() => {
-                leaveActivity(item.id);
+                leaveActivity(item.Id);
+                //setActivityInfo([]);
               }}
             >
               <Text style={styles.buttonOutlineText}>Cancel</Text>

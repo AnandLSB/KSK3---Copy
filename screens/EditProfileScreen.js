@@ -26,6 +26,7 @@ const EditProfileScreen = ({ route }) => {
   );
   const [kskLocation, setKskLocation] = useState(user.kskLocation);
   const [nationality, setNationality] = useState(user.nationality);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
 
   const handleUpdate = async () => {
     await updateDoc(docRef, {
@@ -34,6 +35,7 @@ const EditProfileScreen = ({ route }) => {
       emergencyContact: emergencyContact,
       kskLocation: kskLocation,
       nationality: nationality,
+      phoneNumber: phoneNumber,
     }).then(() => {
       Alert.alert("Profile Updated!");
       navigation.dispatch(StackActions.pop(1));
@@ -46,14 +48,12 @@ const EditProfileScreen = ({ route }) => {
         <ScrollView>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Full Name</Text>
-            <View>
-              <TextInput
-                placeholder={user.fullName}
-                value={fullName}
-                onChangeText={(text) => setFullName(text)}
-                style={styles.input}
-              />
-            </View>
+            <TextInput
+              placeholder={user.fullName}
+              value={fullName}
+              onChangeText={(text) => setFullName(text)}
+              style={styles.input}
+            />
           </View>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Birthdate</Text>
@@ -78,9 +78,12 @@ const EditProfileScreen = ({ route }) => {
           </View>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Phone Number</Text>
-            <View style={styles.infoCont}>
-              <Text>{user.phoneNumber}</Text>
-            </View>
+            <TextInput
+              placeholder={user.phoneNumber}
+              value={phoneNumber}
+              onChangeText={(text) => setPhoneNumber(text)}
+              style={styles.input}
+            />
           </View>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Emergency Contact</Text>
