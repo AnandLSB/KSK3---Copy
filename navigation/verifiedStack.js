@@ -17,6 +17,7 @@ import AllActivitiesScreen from "../screens/AllActivitiesScreen";
 import MyActivitiesScreen from "../screens/MyActivitiesScreen";
 import AllForumsScreen from "../screens/AllForumsScreen";
 import CreatedForumsScreen from "../screens/CreatedForumsScreen";
+import BeneFormScreen from "../screens/BeneFormScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -83,6 +84,7 @@ const VerifiedStack = () => {
         <Stack.Screen name={"AllActivities"} component={AllActivitiesScreen} />
         <Stack.Screen name={"ActivityDetails"} component={Test} />
         <Stack.Screen name={"ForumDetails"} component={ForumScreen} />
+        <Stack.Screen name={"BeneForm"} component={BeneFormScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

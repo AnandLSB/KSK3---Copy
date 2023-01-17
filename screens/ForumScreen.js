@@ -28,6 +28,7 @@ import {
   deleteForumPost,
   updateForumPost,
   addForumPost,
+  joinForum,
 } from "../components/forumFunc";
 import Dialog from "react-native-dialog";
 
@@ -38,12 +39,14 @@ const ForumScreen = ({ route }) => {
   const auth = getAuth();
   const navigation = useNavigation();
   const forumPostRef = collection(db, "forumPost");
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [forumPosts, setForumPosts] = React.useState([]);
   const [postText, setPostText] = React.useState("");
   const [editPostText, setEditPostText] = React.useState("");
   const [editPostId, setEditPostId] = React.useState("");
   const [modalVisible, setModalVisible] = React.useState(false);
   const qForumPost = query(forumPostRef, where("forumId", "==", forumId));
+  const [isMember, setIsMember] = React.useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(qForumPost, (querySnapshot) => {
@@ -53,8 +56,6 @@ const ForumScreen = ({ route }) => {
       ) {
         return;
       }
-
-      //Check if the forumId is in the users myForums array
 
       setForumPosts([]);
       var forumPost = {};
@@ -79,6 +80,21 @@ const ForumScreen = ({ route }) => {
     return () => unsubscribe();
   }, []);
 
+  const checkMember = () => {
+    const unsubscribe = onSnapshot(userRef, (doc) => {
+      if (doc.data().myForums.includes(forumId)) {
+        setIsMember(true);
+      } else {
+        setIsMember(false);
+      }
+    });
+
+    return () => unsubscribe();
+  };
+
+  checkMember();
+  console.log(isMember);
+
   const ManagePost = (props) => {
     return (
       <View>
@@ -97,6 +113,56 @@ const ForumScreen = ({ route }) => {
           }}
         >
           <Text>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const JoinButton = () => {
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            joinForum(forumId);
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Join</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const LeaveButton = () => {
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            leaveForum(forumId);
+            navigation.dispatch(StackActions.pop(1));
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Leave</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const TextSection = () => {
+    return (
+      <View style={styles.section}>
+        <TextInput
+          placeholder="Enter your post here"
+          value={postText}
+          onChangeText={(text) => setPostText(text)}
+          style={styles.input}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            addForumPost(postText, forumId);
+            setPostText("");
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Post</Text>
         </TouchableOpacity>
       </View>
     );
@@ -136,14 +202,7 @@ const ForumScreen = ({ route }) => {
 
       <View style={styles.section}>
         <Text>ForumScreen</Text>
-        <TouchableOpacity
-          onPress={() => {
-            leaveForum(forumId);
-            navigation.dispatch(StackActions.pop(1));
-          }}
-        >
-          <Text style={styles.buttonOutlineText}>Leave Forum</Text>
-        </TouchableOpacity>
+        {isMember ? <LeaveButton /> : <JoinButton />}
       </View>
 
       <FlatList
@@ -161,22 +220,7 @@ const ForumScreen = ({ route }) => {
           </Card>
         )}
       />
-      <View style={styles.section}>
-        <TextInput
-          placeholder="Enter your post here"
-          value={postText}
-          onChangeText={(text) => setPostText(text)}
-          style={styles.input}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            addForumPost(postText, forumId);
-            setPostText("");
-          }}
-        >
-          <Text style={styles.buttonOutlineText}>Post</Text>
-        </TouchableOpacity>
-      </View>
+      {isMember ? <TextSection /> : null}
     </View>
   );
 };

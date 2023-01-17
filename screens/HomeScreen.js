@@ -127,6 +127,14 @@ const HomeScreen = () => {
         )}
       />
 
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("BeneForm");
+        }}
+      >
+        <Text style={styles.buttonOutlineText}>Beneficiary Form</Text>
+      </TouchableOpacity>
+
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>My Upcoming Activities</Text>
       </View>

@@ -45,10 +45,20 @@ const AllForumsScreen = () => {
   const getForums = async () => {
     setForums([]);
     var forum = {};
+    var joined;
     const querySnapshot = await getDocs(qForum);
 
     querySnapshot.forEach((docFor) => {
       let userRef = doc(db, "volunteer", docFor.data().createdBy);
+      let myRef = doc(db, "volunteer", auth.currentUser.uid);
+
+      getDoc(myRef).then((myInfo) => {
+        if (myInfo.data().myForums.includes(docFor.id)) {
+          joined = true;
+        } else {
+          joined = false;
+        }
+      });
 
       getDoc(userRef).then((userInfo) => {
         forum = docFor.data();
@@ -63,6 +73,7 @@ const AllForumsScreen = () => {
           .data({ serverTimestamps: "estimate" })
           .createdAt.toDate();
         forum.id = docFor.id;
+        forum.joined = joined;
 
         setForums((forums) => [...forums, forum]);
       });
@@ -85,6 +96,24 @@ const AllForumsScreen = () => {
     return unique;
   };
 
+  const JoinButton = (props) => {
+    const navigation = useNavigation();
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            joinForum(props.forumId);
+            navigation.navigate("ForumDetails", {
+              forumId: props.forumId,
+            });
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Join</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   forums.sort((a, b) => {
     return b.createdAt - a.createdAt;
   });
@@ -96,6 +125,8 @@ const AllForumsScreen = () => {
       </View>
     );
   }
+
+  console.log(forums);
 
   return (
     <View>
@@ -118,13 +149,7 @@ const AllForumsScreen = () => {
                 <Text>Created By: {item.createdBy}</Text>
               </View>
 
-              <TouchableOpacity
-                onPress={() => {
-                  joinForum(item.id);
-                }}
-              >
-                <Text>Join</Text>
-              </TouchableOpacity>
+              {item.joined ? null : <JoinButton forumId={item.id} />}
             </Card>
           </TouchableOpacity>
         )}
@@ -135,7 +160,13 @@ const AllForumsScreen = () => {
 
 export default AllForumsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  buttonOutlineText: {
+    color: "#0782F9",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+});
 
 /*
     const unsubscribe = onSnapshot(qForum, (querySnapshot) => {
