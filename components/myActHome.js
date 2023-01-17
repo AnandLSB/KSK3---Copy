@@ -16,12 +16,14 @@ const MyActHome = () => {
   const auth = getAuth();
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = useState([]);
+  const [hasActivity, setHasActivity] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(userRef, (docMy) => {
       setMyActivity([]);
       //If the user has joined any activities
-      if (docMy.data().myActivities != null) {
+      if (docMy.data().myActivities.length > 0) {
+        console.log(docMy.data().myActivities);
         docMy.get("myActivities").forEach((item) => {
           let docRef = doc(db, "activities", item);
           var activity = {};
@@ -41,12 +43,24 @@ const MyActHome = () => {
             }
           });
         });
+
+        setHasActivity(true);
+      } else {
+        //If the user has not joined any activities
+        setHasActivity(false);
       }
-      //TODO: Handle if the user has not joined any activities
     });
 
     return () => unsubscribe();
   }, []);
+
+  if (hasActivity === false) {
+    return (
+      <Card>
+        <Text>No activities joined yet</Text>
+      </Card>
+    );
+  }
 
   return (
     <View style={styles.container}>

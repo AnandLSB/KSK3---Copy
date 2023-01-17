@@ -79,6 +79,8 @@ const AllActivitiesScreen = () => {
     );
   }
 
+  //TODO: Add handle for if the activity is full
+
   return (
     <View>
       <Text>Search Bar Here</Text>

@@ -53,6 +53,7 @@ const RegisterExtScreen = ({ route }) => {
           accountCreationDate: accountCreationDate,
           profilePic:
             "https://firebasestorage.googleapis.com/v0/b/kskfyp.appspot.com/o/default%2Fuser.png?alt=media&token=394cb43f-30b0-4e40-81fa-0b220d6e121c",
+          myActivities: [],
         });
       })
       .catch((error) => {

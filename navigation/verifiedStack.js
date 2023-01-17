@@ -5,14 +5,18 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
+import Test from "../screens/test";
+
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import Test from "../screens/test";
+import JoinedForumsScreen from "../screens/JoinedForumsScreen";
 import ForumScreen from "../screens/ForumScreen";
 import EditProfileScreen from "../screens/EditProfileScreen";
 import EditPasswordScreen from "../screens/EditPasswordScreen";
 import AllActivitiesScreen from "../screens/AllActivitiesScreen";
 import MyActivitiesScreen from "../screens/MyActivitiesScreen";
+import AllForumsScreen from "../screens/AllForumsScreen";
+import CreatedForumsScreen from "../screens/CreatedForumsScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,7 +27,16 @@ function TabsTop() {
     <TabTop.Navigator>
       <TabTop.Screen name="My Profile" component={ProfileScreen} />
       <TabTop.Screen name="My Activities" component={MyActivitiesScreen} />
-      <TabTop.Screen name="My Forums" component={Test} />
+      <TabTop.Screen name="My Forums" component={CreatedForumsScreen} />
+    </TabTop.Navigator>
+  );
+}
+
+function TabsTopForum() {
+  return (
+    <TabTop.Navigator>
+      <TabTop.Screen name="Joined Forums" component={JoinedForumsScreen} />
+      <TabTop.Screen name="Discover" component={AllForumsScreen} />
     </TabTop.Navigator>
   );
 }
@@ -32,7 +45,16 @@ function Tabs() {
   return (
     <Tab.Navigator>
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Forum" component={ForumScreen} />
+      <Tab.Screen
+        name="Forum"
+        component={TabsTopForum}
+        options={{
+          headerTitle: "",
+          headerStyle: {
+            height: StatusBar.currentHeight,
+          },
+        }}
+      />
       <Tab.Screen
         name="Profile"
         component={TabsTop}
@@ -60,6 +82,7 @@ const VerifiedStack = () => {
         <Stack.Screen name={"EditPassword"} component={EditPasswordScreen} />
         <Stack.Screen name={"AllActivities"} component={AllActivitiesScreen} />
         <Stack.Screen name={"ActivityDetails"} component={Test} />
+        <Stack.Screen name={"ForumDetails"} component={ForumScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

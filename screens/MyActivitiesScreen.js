@@ -36,7 +36,7 @@ const MyActivitiesScreen = () => {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = React.useState([]);
   const [activityInfo, setActivityInfo] = React.useState([]);
-  const [executed, setExecuted] = React.useState(false);
+  const [hasActivity, setHasActivity] = React.useState(false);
   const [initializing, setInitializing] = React.useState(true);
 
   useEffect(() => {
@@ -45,8 +45,7 @@ const MyActivitiesScreen = () => {
       setActivityInfo([]);
 
       //If the user has joined any activities
-      if (docMy.data().myActivities != null) {
-        //console.log(docMy.data().myActivities);
+      if (docMy.data().myActivities.length > 0) {
         setMyActivity(docMy.data().myActivities);
 
         docMy.get("myActivities").forEach((item) => {
@@ -68,8 +67,11 @@ const MyActivitiesScreen = () => {
             }
           });
         });
+
+        setHasActivity(true);
+      } else {
+        setHasActivity(false);
       }
-      //TODO: Handle if the user has not joined any activities
     });
 
     if (initializing) setInitializing(false);
@@ -77,23 +79,20 @@ const MyActivitiesScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  console.log(myActivity);
-  console.log(activityInfo);
-
-  /*
-  if (isFocused) {
-    if (!executed) {
-      getMyActivities();
-      setExecuted(true);
-    }
-  }
-*/
+  //console.log(myActivity);
+  //console.log(activityInfo);
 
   if (initializing) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
       </View>
+    );
+  } else if (hasActivity === false) {
+    return (
+      <Card>
+        <Text>No activities joined yet</Text>
+      </Card>
     );
   }
 

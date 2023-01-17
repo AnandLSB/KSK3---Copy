@@ -65,7 +65,7 @@ async function checkClash(item) {
   //retrieve from firebase where user activity date = requested date
   const docSnap = await getDoc(userRef);
 
-  if (docSnap.data().myActivities != null) {
+  if (docSnap.data().myActivities.length > 0) {
     //the user has pre-existing activities
     for (let i = 0; i < docSnap.data().myActivities.length; i++) {
       const activityRef = doc(db, "activities", docSnap.data().myActivities[i]);
@@ -135,5 +135,7 @@ async function checkClash(item) {
       });
   }
 }
+
+//TODO: Separate the update function, and add a Volunteer Participation upon joining an activity
 
 export { joinActivity, leaveActivity, checkClash };
