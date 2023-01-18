@@ -13,10 +13,24 @@ import {
   arrayRemove,
   increment,
   Timestamp,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
 const auth = getAuth();
+
+const addVolunteerParticipation = async (activityId) => {
+  const volunPartRef = collection(db, "volunteerParticipation");
+
+  await addDoc(volunPartRef, {
+    volunteerId: auth.currentUser.uid,
+    activityId: activityId,
+    checkInTime: null,
+    checkOutTime: null,
+  }).catch((error) => {
+    console.error("Error adding document: ", error);
+  });
+};
 
 async function joinActivity(activityId, item) {
   const collRef = collection(db, "volunteer");
@@ -34,6 +48,7 @@ async function joinActivity(activityId, item) {
   if (querySnapshot.empty) {
     //user has not already joined the activity
     checkClash(item);
+    addVolunteerParticipation(activityId);
   } else {
     //user has already joined the activity
     Alert.alert("You have already joined this activity!");
@@ -136,6 +151,6 @@ async function checkClash(item) {
   }
 }
 
-//TODO: Separate the update function, and add a Volunteer Participation upon joining an activity
+//TODO: Separate the update function
 
 export { joinActivity, leaveActivity, checkClash };
