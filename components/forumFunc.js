@@ -157,6 +157,23 @@ const deleteForum = async (forumId) => {
     });
 };
 
+const createForumReport = async (forumId, reportText) => {
+  const forumReportRef = collection(db, "reportedForums");
+
+  await addDoc(forumReportRef, {
+    forumId: forumId,
+    reportText: reportText,
+    createdAt: serverTimestamp(),
+    createdBy: auth.currentUser.uid,
+  })
+    .catch((error) => {
+      console.error("Error adding document: ", error);
+    })
+    .then(() => {
+      Alert.alert("Forum Reported!");
+    });
+};
+
 export {
   joinForum,
   leaveForum,
@@ -166,4 +183,5 @@ export {
   addForum,
   editForum,
   deleteForum,
+  createForumReport,
 };

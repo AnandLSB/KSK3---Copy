@@ -31,6 +31,7 @@ import {
   joinForum,
 } from "../components/forumFunc";
 import Dialog from "react-native-dialog";
+import ReportDialog from "../components/reportDialog";
 
 const ForumScreen = ({ route }) => {
   console.log("ForumScreen");
@@ -44,9 +45,11 @@ const ForumScreen = ({ route }) => {
   const [postText, setPostText] = React.useState("");
   const [editPostText, setEditPostText] = React.useState("");
   const [editPostId, setEditPostId] = React.useState("");
-  const [modalVisible, setModalVisible] = React.useState(false);
+  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [reportModalVisible, setReportModalVisible] = React.useState(false);
   const qForumPost = query(forumPostRef, where("forumId", "==", forumId));
   const [isMember, setIsMember] = React.useState(false);
+  const [reportText, setReportText] = React.useState("");
 
   useEffect(() => {
     const unsubscribe = onSnapshot(qForumPost, (querySnapshot) => {
@@ -93,7 +96,6 @@ const ForumScreen = ({ route }) => {
   };
 
   checkMember();
-  console.log(isMember);
 
   const ManagePost = (props) => {
     return (
@@ -101,7 +103,7 @@ const ForumScreen = ({ route }) => {
         <TouchableOpacity
           onPress={() => {
             setEditPostId(props.forumId);
-            setModalVisible(true);
+            setEditModalVisible(true);
           }}
         >
           <Text>Edit</Text>
@@ -172,13 +174,10 @@ const ForumScreen = ({ route }) => {
     return b.createdAt - a.createdAt;
   });
 
-  //TODO: Check whether user is in the forum, display join or leave button accordingly
-  //TODO: Disable the text input for unjoined users
-
   return (
     <View style={styles.container}>
       <View>
-        <Dialog.Container visible={modalVisible}>
+        <Dialog.Container visible={editModalVisible}>
           <Dialog.Title>Edit Your Forum Post</Dialog.Title>
           <Dialog.Input
             placeholder="New Post Content"
@@ -187,21 +186,34 @@ const ForumScreen = ({ route }) => {
           />
           <Dialog.Button
             label="Cancel"
-            onPress={() => setModalVisible(false)}
+            onPress={() => {
+              setEditModalVisible(false);
+              setEditPostText("");
+            }}
           />
           <Dialog.Button
             label="Update"
             onPress={() => {
               updateForumPost(editPostId, editPostText);
-              setModalVisible(false);
+              setEditModalVisible(false);
               setEditPostText("");
             }}
           />
         </Dialog.Container>
       </View>
 
+      <ReportDialog
+        visible={reportModalVisible}
+        setVisible={setReportModalVisible}
+        forumId={forumId}
+      />
+
       <View style={styles.section}>
         <Text>ForumScreen</Text>
+        <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+          <Text>Report</Text>
+        </TouchableOpacity>
+
         {isMember ? <LeaveButton /> : <JoinButton />}
       </View>
 
