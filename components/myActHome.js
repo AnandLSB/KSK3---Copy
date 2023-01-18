@@ -11,9 +11,11 @@ import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
+import { useNavigation } from "@react-navigation/native";
 
 const MyActHome = () => {
   const auth = getAuth();
+  const navigation = useNavigation();
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = useState([]);
   const [hasActivity, setHasActivity] = useState(false);
@@ -72,7 +74,7 @@ const MyActHome = () => {
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
               onPress={() => {
-                //function to register join goes here
+                navigation.navigate("ScanCode");
               }}
             >
               <Text style={styles.buttonOutlineText}>Check In</Text>
