@@ -56,6 +56,11 @@ const MyActHome = () => {
     return () => unsubscribe();
   }, []);
 
+  //Sort according to nearest date
+  myActivity.sort((a, b) => {
+    return a.activityDatetime - b.activityDatetime;
+  });
+
   if (hasActivity === false) {
     return (
       <Card>
@@ -74,7 +79,9 @@ const MyActHome = () => {
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("ScanCode");
+                navigation.navigate("ScanCode", {
+                  activityId: item.id,
+                });
               }}
             >
               <Text style={styles.buttonOutlineText}>Check In</Text>
