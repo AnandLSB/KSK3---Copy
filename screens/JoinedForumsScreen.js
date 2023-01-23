@@ -68,6 +68,8 @@ const JoinedForumsScreen = () => {
 
   console.log(joinedForums);
 
+  //TODO: Show recent posts for each forum
+
   return (
     <View>
       <View>
@@ -124,7 +126,7 @@ const JoinedForumsScreen = () => {
                 <Text>Desc: {item.desc}</Text>
                 <Text>Created By: {item.createdBy}</Text>
               </View>
-
+              {/* Maybe add a recent message component onSnapshot for each forum */}
               <TouchableOpacity
                 onPress={() => {
                   leaveForum(item.id);

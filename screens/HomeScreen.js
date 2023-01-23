@@ -32,6 +32,7 @@ import { format } from "date-fns";
 import { joinActivity, checkClash } from "../components/activityFunc";
 import { useIsFocused } from "@react-navigation/core";
 import MyActHome from "../components/myActHome";
+import MySession from "../components/mySession";
 
 const HomeScreen = () => {
   console.log("HomeScreen");
@@ -86,11 +87,15 @@ const HomeScreen = () => {
     );
   }
 
+  //TODO: Handle if the volunteer slot = 0
+  //TODO: Handle if current date > activity date
+
   return (
     <View style={styles.container}>
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>Volunteer Session</Text>
       </View>
+      <MySession />
 
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>Available Activities</Text>

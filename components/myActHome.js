@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { doc, onSnapshot, getDoc } from "firebase/firestore";
@@ -56,6 +57,30 @@ const MyActHome = () => {
     return () => unsubscribe();
   }, []);
 
+  //Checking if the activity date is today
+  const checkActivityDate = (activityId, activityDatetime) => {
+    const today = new Date();
+
+    if (format(activityDatetime, "dd MM") === format(today, "dd MM")) {
+      navigation.navigate("ScanCode", {
+        activityId: activityId,
+      });
+    } else {
+      Alert.alert("This activity is not being held today!");
+    }
+  };
+
+  //Checking if the user has an ongoing volunteer session
+  const checkSession = async (activityId, activityDatetime) => {
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.data().mySession == null) {
+      checkActivityDate(activityId, activityDatetime);
+    } else {
+      Alert.alert("You have an ongoing volunteer session!");
+    }
+  };
+
   //Sort according to nearest date
   myActivity.sort((a, b) => {
     return a.activityDatetime - b.activityDatetime;
@@ -79,11 +104,10 @@ const MyActHome = () => {
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("ScanCode", {
-                  activityId: item.id,
-                });
+                checkSession(item.id, item.activityDatetime);
               }}
             >
+              {/* TODO: DON'T ALLOW CHECK IN IF GOT ACTIVE SESSION */}
               <Text style={styles.buttonOutlineText}>Check In</Text>
             </TouchableOpacity>
           </Card>

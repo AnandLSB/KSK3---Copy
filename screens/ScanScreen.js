@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Button } from "react-native";
+import { StyleSheet, Text, View, Button, Alert } from "react-native";
 import React, { useEffect, useState } from "react";
 import { BarCodeScanner } from "expo-barcode-scanner";
 import {
@@ -10,15 +10,20 @@ import {
   where,
   getDocs,
   serverTimestamp,
+  arrayRemove,
+  arrayUnion,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
+import { useNavigation } from "@react-navigation/native";
 
 const ScanScreen = ({ route }) => {
   const activityId = route.params.activityId;
   const auth = getAuth();
+  const navigation = useNavigation();
   const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
   useEffect(() => {
     const getBarCodeScannerPermissions = async () => {
@@ -45,6 +50,7 @@ const ScanScreen = ({ route }) => {
       registerCheckIn();
     } else {
       //Invalid QR code for the respective activity
+      Alert.alert("Invalid QR code for this activity!");
     }
   };
 
@@ -55,19 +61,36 @@ const ScanScreen = ({ route }) => {
       where("activityId", "==", activityId),
       where("volunteerId", "==", auth.currentUser.uid)
     );
+    var volunPartId;
 
+    //Running query to get the respective volunteerParticipation document
     await getDocs(q)
       .then((docColl) => {
         docColl.forEach((docPart) => {
           const docRef = doc(db, "volunteerParticipation", docPart.id);
+          volunPartId = docPart.id;
 
+          //Updating timestamp for the check-in time
           updateDoc(docRef, {
             checkInTime: serverTimestamp(),
           });
         });
       })
       .then(() => {
-        alert("Check in successful");
+        updateDoc(userRef, {
+          myActivities: arrayRemove(activityId),
+          mySession: activityId,
+        });
+      })
+      .catch((error) => {
+        console.error("Error updating document: ", error);
+      })
+      .then(() => {
+        navigation.navigate("PostScan", {
+          activityId: activityId,
+          volunPartId: volunPartId,
+          status: "checkIn",
+        });
       });
   };
 

@@ -19,6 +19,7 @@ import AllForumsScreen from "../screens/AllForumsScreen";
 import CreatedForumsScreen from "../screens/CreatedForumsScreen";
 import BeneFormScreen from "../screens/BeneFormScreen";
 import ScanScreen from "../screens/ScanScreen";
+import PostScanScreen from "../screens/PostScanScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -87,6 +88,7 @@ const VerifiedStack = () => {
         <Stack.Screen name={"ForumDetails"} component={ForumScreen} />
         <Stack.Screen name={"BeneForm"} component={BeneFormScreen} />
         <Stack.Screen name={"ScanCode"} component={ScanScreen} />
+        <Stack.Screen name={"PostScan"} component={PostScanScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

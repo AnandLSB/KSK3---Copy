@@ -14,6 +14,7 @@ import {
   increment,
   Timestamp,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 
@@ -44,26 +45,43 @@ async function joinActivity(activityId, item) {
   );
 
   const querySnapshot = await getDocs(q);
+  const docSnap = await getDoc(userRef);
 
-  if (querySnapshot.empty) {
-    //user has not already joined the activity
+  if (docSnap.data().mySession === activityId) {
+    Alert.alert("You have an ongoing session for this activity!");
+  } else if (!querySnapshot.empty) {
+    Alert.alert("You have already joined this activity!");
+  } else {
+    //User has not already joined the activity
     checkClash(item);
     addVolunteerParticipation(activityId);
-  } else {
-    //user has already joined the activity
-    Alert.alert("You have already joined this activity!");
   }
 }
 
 async function leaveActivity(activityId) {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
+  const q = query(
+    collection(db, "volunteerParticipation"),
+    where("activityId", "==", activityId),
+    where("volunteerId", "==", auth.currentUser.uid)
+  );
 
   await updateDoc(userRef, {
+    //Removing the activity from myActivities array
     myActivities: arrayRemove(activityId),
   }).then(() => {
+    //Incrementing the volunteer slot of the activity by 1
     updateDoc(doc(db, "activities", activityId), {
       volunteerSlot: increment(+1),
     })
+      .then(() => {
+        //Deleting the respective volunteer participation document
+        getDocs(q).then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            deleteDoc(doc.ref);
+          });
+        });
+      })
       .catch((error) => {
         console.error("Error updating document: ", error);
       })
