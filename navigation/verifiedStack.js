@@ -20,6 +20,7 @@ import CreatedForumsScreen from "../screens/CreatedForumsScreen";
 import BeneFormScreen from "../screens/BeneFormScreen";
 import ScanScreen from "../screens/ScanScreen";
 import PostScanScreen from "../screens/PostScanScreen";
+import CompletedActivitiesScreen from "../screens/CompletedActivitiesScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,6 +90,10 @@ const VerifiedStack = () => {
         <Stack.Screen name={"BeneForm"} component={BeneFormScreen} />
         <Stack.Screen name={"ScanCode"} component={ScanScreen} />
         <Stack.Screen name={"PostScan"} component={PostScanScreen} />
+        <Stack.Screen
+          name={"CompletedActivities"}
+          component={CompletedActivitiesScreen}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

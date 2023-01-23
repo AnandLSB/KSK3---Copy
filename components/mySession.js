@@ -120,6 +120,13 @@ const MySession = () => {
           <Text>{mySession.activityName}</Text>
           <Text>{mySession.checkInTime}</Text>
           <Text>{mySession.volunPartId}</Text>
+          {mySession.activityCategory == "Food Bank" ? (
+            <View>
+              <TouchableOpacity onPress={() => navigation.navigate("BeneForm")}>
+                <Text>Beneficiary Form</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
         <TouchableOpacity onPress={() => registerCheckOut()}>
           <Text>Check Out</Text>

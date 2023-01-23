@@ -26,12 +26,13 @@ import {
 } from "firebase/firestore";
 import Card from "../components/card";
 import { format } from "date-fns";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { leaveActivity } from "../components/activityFunc";
 
 const MyActivitiesScreen = () => {
   console.log("MyActivitiesScreen");
   const isFocused = useIsFocused();
+  const navigation = useNavigation();
   const auth = getAuth();
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = React.useState([]);
@@ -109,7 +110,14 @@ const MyActivitiesScreen = () => {
   return (
     <View style={styles.container}>
       <Text>MyActivitiesScreen</Text>
-      <Text>Completed Activities</Text>
+      <TouchableOpacity
+        onPress={() => {
+          navigation.navigate("CompletedActivities");
+        }}
+      >
+        <Text>Completed Activities</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={activityInfo}
         renderItem={({ item }) => (
