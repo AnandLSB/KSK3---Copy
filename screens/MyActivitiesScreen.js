@@ -109,6 +109,7 @@ const MyActivitiesScreen = () => {
   return (
     <View style={styles.container}>
       <Text>MyActivitiesScreen</Text>
+      <Text>Completed Activities</Text>
       <FlatList
         data={activityInfo}
         renderItem={({ item }) => (
