@@ -33,6 +33,7 @@ import { joinActivity, checkClash } from "../components/activityFunc";
 import { useIsFocused } from "@react-navigation/core";
 import MyActHome from "../components/myActHome";
 import MySession from "../components/mySession";
+import messaging from "@react-native-firebase/messaging";
 
 const HomeScreen = () => {
   console.log("HomeScreen");
@@ -131,6 +132,16 @@ const HomeScreen = () => {
           </Card>
         )}
       />
+
+      <TouchableOpacity
+        onPress={() => {
+          messaging()
+            .subscribeToTopic("ZucRtpLDRlahhvcn9MLE")
+            .then(() => console.log("Subscribed to topic!"));
+        }}
+      >
+        <Text>Subscribe to Topic</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => {

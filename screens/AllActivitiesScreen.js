@@ -28,6 +28,7 @@ import { format } from "date-fns";
 import { joinActivity, checkClash } from "../components/activityFunc";
 
 const AllActivitiesScreen = () => {
+  console.log("AllActivitiesScreen");
   const auth = getAuth();
   const activitiesRef = collection(db, "activities");
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
@@ -69,7 +70,7 @@ const AllActivitiesScreen = () => {
     if (initializing) setInitializing(false);
   };
 
-  //console.log(activities);
+  console.log(activities);
 
   if (initializing) {
     return (

@@ -19,7 +19,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import React, { useEffect } from "react";
+import React, { useEffect, useLayoutEffect } from "react";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import { db } from "../config/firebase";
 import Card from "../components/card";
@@ -51,7 +51,7 @@ const ForumScreen = ({ route }) => {
   const [isMember, setIsMember] = React.useState(false);
   const [reportText, setReportText] = React.useState("");
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const unsubscribe = onSnapshot(qForumPost, (querySnapshot) => {
       if (
         querySnapshot.metadata.fromCache &&
@@ -75,7 +75,11 @@ const ForumScreen = ({ route }) => {
             .data({ serverTimestamps: "estimate" })
             .createdAt.toDate();
 
-          setForumPosts((forumPosts) => [...forumPosts, forumPost]);
+          setForumPosts((forumPosts) =>
+            Array.from(new Set([...forumPosts, forumPost]))
+          );
+
+          //setForumPosts((forumPosts) => [...forumPosts, forumPost]);
         });
       });
     });
@@ -213,11 +217,11 @@ const ForumScreen = ({ route }) => {
         <TouchableOpacity onPress={() => setReportModalVisible(true)}>
           <Text>Report</Text>
         </TouchableOpacity>
-
         {isMember ? <LeaveButton /> : <JoinButton />}
       </View>
 
       <FlatList
+        inverted
         data={forumPosts}
         renderItem={({ item }) => (
           <Card>
@@ -231,8 +235,28 @@ const ForumScreen = ({ route }) => {
             ) : null}
           </Card>
         )}
+        keyExtractor={(item) => item.id.toString()}
       />
-      {isMember ? <TextSection /> : null}
+
+      <View style={styles.section}>
+        <TextInput
+          placeholder="Enter your post here"
+          value={postText}
+          onChangeText={(text) => setPostText(text)}
+          style={styles.input}
+          editable={isMember}
+        />
+
+        <TouchableOpacity
+          onPress={() => {
+            addForumPost(postText, forumId);
+            setPostText("");
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Post</Text>
+        </TouchableOpacity>
+      </View>
+      {/* Put the textinput bare because when you type it resets */}
     </View>
   );
 };
