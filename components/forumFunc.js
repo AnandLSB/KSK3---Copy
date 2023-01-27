@@ -12,9 +12,11 @@ import {
   deleteDoc,
   addDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
+import messaging from "@react-native-firebase/messaging";
 
 const auth = getAuth();
 
@@ -38,6 +40,11 @@ const joinForum = async (forumId) => {
         console.log(error);
       })
       .then(() => {
+        messaging()
+          .subscribeToTopic(forumId)
+          .then(() => {
+            console.log("Subscribed to topic: " + forumId);
+          });
         Alert.alert("Joined Forum");
       });
   } else {
@@ -51,6 +58,13 @@ const leaveForum = async (forumId) => {
   await updateDoc(userRef, {
     myForums: arrayRemove(forumId),
   })
+    .then(() => {
+      messaging()
+        .unsubscribeFromTopic(forumId)
+        .then(() => {
+          console.log("Unsubscribed from topic: " + forumId);
+        });
+    })
     .catch((error) => {
       console.log(error);
     })
@@ -82,20 +96,22 @@ const deleteForumPost = async (forumId) => {
 };
 
 const addForumPost = async (postText, forumId) => {
-  console.log("postText: " + postText);
-  console.log("forumId: " + forumId);
   const forumPostRef = collection(db, "forumPost");
+  const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
-  await addDoc(forumPostRef, {
-    content: postText,
-    createdAt: serverTimestamp(),
-    createdBy: auth.currentUser.uid,
-    forumId: forumId,
-  })
-    .then(console.log("Post Created"))
-    .catch((error) => {
-      console.error("Error adding document: ", error);
-    });
+  await getDoc(userRef).then((userDoc) => {
+    addDoc(forumPostRef, {
+      content: postText,
+      createdAt: serverTimestamp(),
+      createdBy: auth.currentUser.uid,
+      forumId: forumId,
+      username: userDoc.data().Username,
+    })
+      .then(console.log("Post Created"))
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  });
 };
 
 const addForum = async (forumTitle, forumDesc) => {

@@ -10,9 +10,17 @@ import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { collection, query, onSnapshot, where, doc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
-import { addForumPost, leaveForum, joinForum } from "../components/forumFunc";
+import {
+  addForumPost,
+  leaveForum,
+  joinForum,
+  deleteForumPost,
+  updateForumPost,
+} from "../components/forumFunc";
 import { getAuth } from "firebase/auth";
 import { useNavigation, StackActions } from "@react-navigation/native";
+import Dialog from "react-native-dialog";
+import ReportDialog from "../components/reportDialog";
 
 const ForumScreen2 = ({ route }) => {
   let forumId = route.params.forumId;
@@ -20,6 +28,14 @@ const ForumScreen2 = ({ route }) => {
   const navigation = useNavigation();
   //Member State
   const [isMember, setIsMember] = React.useState(false);
+
+  //Edit Post State
+  const [editPostId, setEditPostId] = React.useState("");
+  const [editModalVisible, setEditModalVisible] = React.useState(false);
+  const [editPostText, setEditPostText] = React.useState("");
+
+  //Report Forum State
+  const [reportModalVisible, setReportModalVisible] = React.useState(false);
 
   //Forum Post State
   const [forumPosts, setForumPosts] = React.useState([]);
@@ -40,6 +56,7 @@ const ForumScreen2 = ({ route }) => {
             .createdAt.toDate(),
           createdBy: doc.data().createdBy,
           content: doc.data().content,
+          username: doc.data().username,
         }))
       );
     });
@@ -95,12 +112,40 @@ const ForumScreen2 = ({ route }) => {
     );
   };
 
+  const ManagePost = (props) => {
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() => {
+            setEditPostId(props.forumId);
+            setEditModalVisible(true);
+          }}
+        >
+          <Text>Edit</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            deleteForumPost(props.forumId);
+          }}
+        >
+          <Text>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
   const Message = ({ item }) => {
     return (
       <Card>
-        <View>
-          <Text>{item.content}</Text>
-          <Text>Created By: {item.createdBy}</Text>
+        <View style={styles.section}>
+          <View>
+            <Text>{item.content}</Text>
+            <Text>Created By: {item.username}</Text>
+          </View>
+          {item.createdBy === auth.currentUser.uid ? (
+            <ManagePost forumId={item.id} />
+          ) : null}
         </View>
       </Card>
     );
@@ -108,8 +153,43 @@ const ForumScreen2 = ({ route }) => {
 
   return (
     <View style={{ flex: 1 }}>
+      <View>
+        <Dialog.Container visible={editModalVisible}>
+          <Dialog.Title>Edit Your Forum Post</Dialog.Title>
+          <Dialog.Input
+            placeholder="New Post Content"
+            value={editPostText}
+            onChangeText={(text) => setEditPostText(text)}
+          />
+          <Dialog.Button
+            label="Cancel"
+            onPress={() => {
+              setEditModalVisible(false);
+              setEditPostText("");
+            }}
+          />
+          <Dialog.Button
+            label="Update"
+            onPress={() => {
+              updateForumPost(editPostId, editPostText);
+              setEditModalVisible(false);
+              setEditPostText("");
+            }}
+          />
+        </Dialog.Container>
+      </View>
+
+      <ReportDialog
+        visible={reportModalVisible}
+        setVisible={setReportModalVisible}
+        forumId={forumId}
+      />
+
       <View style={styles.section}>
         <Text>ForumScreen2</Text>
+        <TouchableOpacity onPress={() => setReportModalVisible(true)}>
+          <Text>Report</Text>
+        </TouchableOpacity>
         {isMember ? <LeaveButton /> : <JoinButton />}
       </View>
 
@@ -129,8 +209,10 @@ const ForumScreen2 = ({ route }) => {
           value={postText}
           onChangeText={(text) => setPostText(text)}
           style={styles.input}
+          editable={isMember}
         />
         <TouchableOpacity
+          disabled={!isMember}
           onPress={() => {
             addForumPost(postText, forumId);
             setPostText("");

@@ -30,6 +30,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getStorage, getDownloadURL } from "firebase/storage";
 import { uuidv4 } from "@firebase/util";
 import Dialog from "react-native-dialog";
+import messaging from "@react-native-firebase/messaging";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -139,6 +140,21 @@ const ProfileScreen = () => {
       alert("Error updating document: ", error);
     });
   }
+
+  const signOutUser = () => {
+    const userRef = doc(db, "volunteer", auth.currentUser.uid);
+
+    getDoc(userRef)
+      .then((userDoc) => {
+        if (userDoc.data().myForums.length > 0) {
+          userDoc.get("myForums").forEach((forumItem) => {
+            messaging().unsubscribeFromTopic(forumItem);
+            console.log("Unsubscribed from " + forumItem);
+          });
+        }
+      })
+      .then(() => signOut(auth));
+  };
 
   if (initializing) {
     return (
@@ -283,7 +299,7 @@ const ProfileScreen = () => {
           <Text style={styles.buttonOutlineText}>Delete Account</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => signOut(auth)}
+          onPress={() => signOutUser()}
           style={[styles.button, styles.buttonOutline]}
         >
           <Text style={styles.buttonOutlineText}>Logout</Text>

@@ -12,8 +12,11 @@ import {
   Alert,
 } from "react-native";
 import { auth } from "../config/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import { db } from "../config/firebase";
+import messaging from "@react-native-firebase/messaging";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -21,10 +24,25 @@ const LoginScreen = () => {
   const auth = getAuth();
   const navigation = useNavigation();
 
+  const subscribeForums = (userID) => {
+    const userRef = doc(db, "volunteer", userID);
+
+    getDoc(userRef).then((userDoc) => {
+      if (userDoc.data().myForums.length > 0) {
+        userDoc.get("myForums").forEach((forumItem) => {
+          messaging().subscribeToTopic(forumItem);
+          console.log("Subscribed to " + forumItem);
+        });
+      }
+    });
+  };
+
   const handleSignIn = () => {
-    signInWithEmailAndPassword(auth, email, password).catch((error) =>
-      alert(error.message)
-    );
+    signInWithEmailAndPassword(auth, email, password)
+      .then(() => {
+        subscribeForums(auth.currentUser.uid);
+      })
+      .catch((error) => alert(error.message));
   };
 
   const handlePassReset = () => {
