@@ -82,6 +82,8 @@ const deleteForumPost = async (forumId) => {
 };
 
 const addForumPost = async (postText, forumId) => {
+  console.log("postText: " + postText);
+  console.log("forumId: " + forumId);
   const forumPostRef = collection(db, "forumPost");
 
   await addDoc(forumPostRef, {
@@ -89,9 +91,11 @@ const addForumPost = async (postText, forumId) => {
     createdAt: serverTimestamp(),
     createdBy: auth.currentUser.uid,
     forumId: forumId,
-  }).catch((error) => {
-    console.error("Error adding document: ", error);
-  });
+  })
+    .then(console.log("Post Created"))
+    .catch((error) => {
+      console.error("Error adding document: ", error);
+    });
 };
 
 const addForum = async (forumTitle, forumDesc) => {

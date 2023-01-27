@@ -222,6 +222,9 @@ const ForumScreen = ({ route }) => {
 
       <FlatList
         inverted
+        windowSize={5}
+        initialNumToRender={10}
+        removeClippedSubviews={true}
         data={forumPosts}
         renderItem={({ item }) => (
           <Card>
