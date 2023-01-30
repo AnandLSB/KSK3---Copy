@@ -89,7 +89,7 @@ const HomeScreen = () => {
   }
 
   //TODO: Handle if the volunteer slot = 0
-  //TODO: Handle if current date > activity date
+  //TODO: Handle if current date > activity date; Activity has already been held
 
   return (
     <View style={styles.container}>

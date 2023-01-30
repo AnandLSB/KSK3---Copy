@@ -22,6 +22,7 @@ import ScanScreen from "../screens/ScanScreen";
 import PostScanScreen from "../screens/PostScanScreen";
 import CompletedActivitiesScreen from "../screens/CompletedActivitiesScreen";
 import ForumScreen2 from "../screens/ForumScreen2";
+import DiscoverForumsScreen from "../screens/DiscoverForumsScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -41,7 +42,7 @@ function TabsTopForum() {
   return (
     <TabTop.Navigator>
       <TabTop.Screen name="Joined Forums" component={JoinedForumsScreen} />
-      <TabTop.Screen name="Discover" component={AllForumsScreen} />
+      <TabTop.Screen name="Discover" component={DiscoverForumsScreen} />
     </TabTop.Navigator>
   );
 }

@@ -48,7 +48,9 @@ const CreatedForumsScreen = () => {
         getDoc(userRef).then((userInfo) => {
           forum = docFor.data();
           forum.createdBy = userInfo.data().Username;
-          forum.createdAt = docFor.data().createdAt.toDate();
+          forum.createdAt = docFor
+            .data({ serverTimestamps: "estimate" })
+            .createdAt.toDate();
           forum.id = docFor.id;
 
           setMyForums((myforums) => [...myforums, forum]);

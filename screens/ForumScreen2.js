@@ -5,6 +5,7 @@ import {
   FlatList,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect } from "react";
 import { collection, query, onSnapshot, where, doc } from "firebase/firestore";
@@ -135,7 +136,7 @@ const ForumScreen2 = ({ route }) => {
     );
   };
 
-  const Message = ({ item }) => {
+  const Post = ({ item }) => {
     return (
       <Card>
         <View style={styles.section}>
@@ -198,7 +199,7 @@ const ForumScreen2 = ({ route }) => {
         windowSize={5}
         initialNumToRender={10}
         removeClippedSubviews={true}
-        renderItem={({ item }) => <Message item={item} />}
+        renderItem={({ item }) => <Post item={item} />}
         keyExtractor={(item) => item.id.toString()}
         inverted
       />
@@ -214,8 +215,12 @@ const ForumScreen2 = ({ route }) => {
         <TouchableOpacity
           disabled={!isMember}
           onPress={() => {
-            addForumPost(postText, forumId);
-            setPostText("");
+            if (postText !== "") {
+              addForumPost(postText, forumId);
+              setPostText("");
+            } else {
+              Alert.alert("Empty Field Detected", "Please enter a post");
+            }
           }}
         >
           <Text style={styles.buttonOutlineText}>Post</Text>
