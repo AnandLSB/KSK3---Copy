@@ -4,18 +4,19 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import * as RootNavigation from "../RootNavigation";
 
 import Test from "../screens/test";
 
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import JoinedForumsScreen from "../screens/JoinedForumsScreen";
-import ForumScreen from "../screens/ForumScreen";
+import ForumScreen from "../screens/ForumScreen"; //Old Screen
 import EditProfileScreen from "../screens/EditProfileScreen";
 import EditPasswordScreen from "../screens/EditPasswordScreen";
 import AllActivitiesScreen from "../screens/AllActivitiesScreen";
 import MyActivitiesScreen from "../screens/MyActivitiesScreen";
-import AllForumsScreen from "../screens/AllForumsScreen";
+import AllForumsScreen from "../screens/AllForumsScreen"; //Old Screen
 import CreatedForumsScreen from "../screens/CreatedForumsScreen";
 import BeneFormScreen from "../screens/BeneFormScreen";
 import ScanScreen from "../screens/ScanScreen";
@@ -77,7 +78,7 @@ function Tabs() {
 
 const VerifiedStack = () => {
   return (
-    <NavigationContainer independent={true}>
+    <NavigationContainer independent={true} ref={RootNavigation.navigationRef}>
       <Stack.Navigator>
         <Stack.Screen
           name="Tabs"

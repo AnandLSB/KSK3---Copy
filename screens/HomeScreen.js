@@ -35,6 +35,8 @@ import MyActHome from "../components/myActHome";
 import MySession from "../components/mySession";
 import messaging from "@react-native-firebase/messaging";
 
+import * as RootNavigation from "../RootNavigation";
+
 const HomeScreen = () => {
   console.log("HomeScreen");
   const navigation = useNavigation();
@@ -132,6 +134,14 @@ const HomeScreen = () => {
           </Card>
         )}
       />
+
+      <TouchableOpacity
+        onPress={() => {
+          RootNavigation.navigate("BeneForm");
+        }}
+      >
+        <Text>Navigate</Text>
+      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => {

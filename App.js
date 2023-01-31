@@ -6,6 +6,7 @@ import { NavigationContainer, StackActions } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import messaging from "@react-native-firebase/messaging";
+import * as RootNavigation from "./RootNavigation";
 
 import AuthStack from "./navigation/authStack";
 import Splash from "./screens/Splash";
@@ -66,6 +67,9 @@ function App() {
         "Notification caused app to open from background state:",
         remoteMessage.notification
       );
+      RootNavigation.navigate("ForumDetails", {
+        forumId: remoteMessage.data.forumId,
+      });
     });
 
     // Register background handler
