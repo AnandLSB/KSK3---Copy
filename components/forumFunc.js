@@ -128,6 +128,8 @@ const addForum = async (forumTitle, forumDesc) => {
       updateDoc(userRef, {
         myForums: arrayUnion(docRef.id),
       });
+      messaging().subscribeToTopic(docRef.id);
+      console.log("Subscribed to topic: " + docRef.id);
     })
     .catch((error) => {
       console.error("Error adding document: ", error);
@@ -168,6 +170,8 @@ const deleteForum = async (forumId) => {
       updateDoc(userRef, {
         myForums: arrayRemove(forumId),
       });
+      messaging().unsubscribeFromTopic(forumId);
+      console.log("Unsubscribed from topic: " + forumId);
     })
     .catch(() => {
       console.log("Error deleting forum");

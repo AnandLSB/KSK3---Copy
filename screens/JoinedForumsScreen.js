@@ -28,11 +28,11 @@ const JoinedForumsScreen = () => {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [joinedForums, setJoinedForums] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
 
   const [forumTitle, setForumTitle] = React.useState("");
   const [forumDesc, setForumDesc] = React.useState("");
-
+  /*
   useLayoutEffect(() => {
     const unsubscribe = onSnapshot(userRef, (forumDoc) => {
       setJoinedForums([]);
@@ -71,33 +71,64 @@ const JoinedForumsScreen = () => {
 
     return () => unsubscribe();
   }, [isFocused]);
+  */
 
-  /*
   useLayoutEffect(() => {
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
       const joinedForums = [];
+
       if (snapshot.data().myForums.length > 0) {
         snapshot.get("myForums").forEach((forumDoc) => {
-          let docRef = doc(db, "forums", forumDoc);
-
-          getDoc(docRef).then((docInf) => {
-            joinedForums.push({
-              ...docInf.data(),
-              id: docInf.id,
-            });
+          joinedForums.push({
+            id: forumDoc,
           });
         });
-      }
 
-      setJoinedForums(joinedForums);
+        getForumData(joinedForums).then((joinedForumsData) => {
+          setJoinedForums(joinedForumsData);
+        });
+      }
     });
-    setLoading(!loading);
+
     return () => unsubscribe();
-  }, []);
-  
-  useEffect(() => {
-    setLoading(false);
   }, [isFocused]);
+
+  const getForumData = async (joinedForums) => {
+    const joinedForumsData = [];
+
+    for (let forum of joinedForums) {
+      let docRef = doc(db, "forums", forum.id);
+      const docInf = await getDoc(docRef);
+      const author = await getForumAuthor(docInf.data().createdBy);
+
+      joinedForumsData.push({
+        ...docInf.data(),
+        id: docInf.id,
+        createdBy: author,
+        createdAt: docInf
+          .data({ serverTimestamps: "estimate" })
+          .createdAt.toDate(),
+      });
+    }
+
+    return joinedForumsData;
+  };
+
+  const getForumAuthor = async (userID) => {
+    var author;
+
+    if (userID !== auth.currentUser.uid) {
+      const userRef = doc(db, "volunteer", userID);
+
+      await getDoc(userRef).then((userDoc) => {
+        author = userDoc.data().Username;
+      });
+    } else {
+      author = "You";
+    }
+
+    return author;
+  };
 
   if (loading) {
     return (
@@ -106,8 +137,6 @@ const JoinedForumsScreen = () => {
       </View>
     );
   }
-  */
-  console.log(joinedForums);
 
   //TODO: Show recent posts for each forum
   //TODO: Sort alphabetically or by update timestamp?

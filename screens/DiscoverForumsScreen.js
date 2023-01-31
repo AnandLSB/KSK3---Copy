@@ -37,7 +37,7 @@ const DiscoverForumsScreen = () => {
 
       qSnapshot.forEach((docFor) => {
         Promise.all([
-          getPostAuthor(docFor.data().createdBy),
+          getForumAuthor(docFor.data().createdBy),
           getJoinedStatus(docFor.id),
         ]).then((values) => {
           forums.push({
@@ -45,7 +45,9 @@ const DiscoverForumsScreen = () => {
             id: docFor.id,
             createdBy: values[0],
             joined: values[1],
-            createdAt: docFor.data().createdAt.toDate(),
+            createdAt: docFor
+              .data({ serverTimestamps: "estimate" })
+              .createdAt.toDate(),
           });
         });
       });
@@ -63,7 +65,7 @@ const DiscoverForumsScreen = () => {
     setLoading(false);
   }, [isFocused]);
 
-  const getPostAuthor = async (userID) => {
+  const getForumAuthor = async (userID) => {
     var author;
 
     if (userID !== auth.currentUser.uid) {
