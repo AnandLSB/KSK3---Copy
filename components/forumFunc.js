@@ -97,6 +97,7 @@ const deleteForumPost = async (forumId) => {
 
 const addForumPost = async (postText, forumId) => {
   const forumPostRef = collection(db, "forumPost");
+  const forumRef = doc(db, "forums", forumId);
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
   await getDoc(userRef).then((userDoc) => {
@@ -107,6 +108,11 @@ const addForumPost = async (postText, forumId) => {
       forumId: forumId,
       username: userDoc.data().Username,
     })
+      .then(() => {
+        updateDoc(forumRef, {
+          updatedAt: serverTimestamp(),
+        });
+      })
       .then(console.log("Post Created"))
       .catch((error) => {
         console.error("Error adding document: ", error);
@@ -123,6 +129,7 @@ const addForum = async (forumTitle, forumDesc) => {
     desc: forumDesc,
     createdBy: auth.currentUser.uid,
     createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
   })
     .then((docRef) => {
       updateDoc(userRef, {
@@ -154,7 +161,12 @@ const editForum = async (forumId, newTitle, newDesc) => {
 
 const deleteForum = async (forumId) => {
   const forumPostRef = collection(db, "forumPost");
+  const volunteerRef = collection(db, "volunteer");
   const qForumPost = query(forumPostRef, where("forumId", "==", forumId));
+  const qMyForum = query(
+    volunteerRef,
+    where("myForums", "array-contains", forumId)
+  );
 
   await getDocs(qForumPost)
     .then((querySnapshot) => {
@@ -166,10 +178,14 @@ const deleteForum = async (forumId) => {
       deleteDoc(doc(db, "forums", forumId));
     })
     .then(() => {
-      const userRef = doc(db, "volunteer", auth.currentUser.uid);
-      updateDoc(userRef, {
-        myForums: arrayRemove(forumId),
+      getDocs(qMyForum).then((querySnapshot) => {
+        querySnapshot.forEach((docUser) => {
+          updateDoc(doc(db, "volunteer", docUser.id), {
+            myForums: arrayRemove(forumId),
+          });
+        });
       });
+
       messaging().unsubscribeFromTopic(forumId);
       console.log("Unsubscribed from topic: " + forumId);
     })

@@ -27,7 +27,7 @@ const DiscoverForumsScreen = () => {
   const navigation = useNavigation();
   const [forums, setForums] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
-
+  /*
   useLayoutEffect(() => {
     const forumsRef = collection(db, "forums");
     const qForum = query(forumsRef, orderBy("createdAt", "desc"));
@@ -56,14 +56,43 @@ const DiscoverForumsScreen = () => {
 
     return () => unsubscribe();
   }, []);
+  */
+  useLayoutEffect(() => {
+    setLoading(true);
+    const forumsRef = collection(db, "forums");
+    const qForum = query(forumsRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(qForum, async (qSnapshot) => {
+      const forums = [];
+
+      for (const doc of qSnapshot.docs) {
+        const joined = await getJoinedStatus(doc.id);
+        const author = await getForumAuthor(doc.data().createdBy);
+
+        forums.push({
+          ...doc.data(),
+          id: doc.id,
+          createdBy: author,
+          joined: joined,
+          createdAt: doc
+            .data({ serverTimestamps: "estimate" })
+            .createdAt.toDate(),
+        });
+      }
+
+      setForums(forums);
+    });
+
+    if (loading) {
+      setLoading(false);
+    }
+
+    return () => unsubscribe();
+  }, [isFocused]);
 
   forums.sort((a, b) => {
     return b.createdAt - a.createdAt;
   });
-
-  useEffect(() => {
-    setLoading(false);
-  }, [isFocused]);
 
   const getForumAuthor = async (userID) => {
     var author;

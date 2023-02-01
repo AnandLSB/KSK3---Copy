@@ -89,25 +89,40 @@ const MySession = () => {
     );
 
     await updateDoc(volunPartRef, {
+      //Setting the checkout time
       checkOutTime: serverTimestamp(),
-    }).then(() => {
-      updateDoc(userRef, {
-        mySession: null,
-        myCompleteAct: arrayUnion(mySession.id),
-      })
-        .catch((error) => {
-          console.log(error);
-        })
-        .then(() => {
-          setHasSession(false);
-          //Navigate to check out screen
-          navigation.navigate("PostScan", {
-            activityId: mySession.id,
-            volunPartId: mySession.volunPartId,
-            status: "checkOut",
-          });
+    })
+      .then(async () => {
+        //Calculating the total hours
+        const docSnap = await getDoc(volunPartRef);
+
+        await updateDoc(volunPartRef, {
+          totalHours:
+            Math.abs(
+              docSnap.data().checkOutTime.toDate() -
+                docSnap.data().checkInTime.toDate()
+            ) / 36e5,
         });
-    });
+      })
+      .then(() => {
+        //Transfer the session to the completed activities array
+        updateDoc(userRef, {
+          mySession: null,
+          myCompleteAct: arrayUnion(mySession.id),
+        })
+          .catch((error) => {
+            console.log(error);
+          })
+          .then(() => {
+            setHasSession(false);
+            //Navigate to check out screen
+            navigation.navigate("PostScan", {
+              activityId: mySession.id,
+              volunPartId: mySession.volunPartId,
+              status: "checkOut",
+            });
+          });
+      });
   };
 
   //TODO: Add ternary operator based on whether the user has a session or not

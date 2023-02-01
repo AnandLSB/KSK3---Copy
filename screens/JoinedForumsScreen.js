@@ -108,6 +108,9 @@ const JoinedForumsScreen = () => {
         createdAt: docInf
           .data({ serverTimestamps: "estimate" })
           .createdAt.toDate(),
+        updatedAt: docInf
+          .data({ serverTimestamps: "estimate" })
+          .updatedAt.toDate(),
       });
     }
 
@@ -129,6 +132,10 @@ const JoinedForumsScreen = () => {
 
     return author;
   };
+
+  joinedForums.sort((a, b) => {
+    return b.updatedAt - a.updatedAt;
+  });
 
   if (loading) {
     return (
