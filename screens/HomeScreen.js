@@ -49,12 +49,13 @@ const HomeScreen = () => {
   const [initializing, setInitializing] = React.useState(true);
   const [allActivity, setActivity] = React.useState([]);
   const [myActivity, setMyActivity] = React.useState([]);
+
   const qAll = query(
     allActivitiesRef,
     where("volunteerSlot", ">", 0),
     orderBy("volunteerSlot", "desc"),
     orderBy("createdAt", "desc"),
-    limit(1)
+    limit(2)
   );
 
   useEffect(() => {
@@ -90,7 +91,6 @@ const HomeScreen = () => {
     );
   }
 
-  //TODO: Handle if the volunteer slot = 0
   //TODO: Handle if current date > activity date; Activity has already been held
 
   return (
@@ -134,24 +134,6 @@ const HomeScreen = () => {
           </Card>
         )}
       />
-
-      <TouchableOpacity
-        onPress={() => {
-          RootNavigation.navigate("BeneForm");
-        }}
-      >
-        <Text>Navigate</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        onPress={() => {
-          messaging()
-            .subscribeToTopic("ZucRtpLDRlahhvcn9MLE")
-            .then(() => console.log("Subscribed to topic!"));
-        }}
-      >
-        <Text>Subscribe to Topic</Text>
-      </TouchableOpacity>
 
       <TouchableOpacity
         onPress={() => {

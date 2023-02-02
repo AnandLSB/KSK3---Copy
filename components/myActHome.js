@@ -11,7 +11,7 @@ import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
 import Card from "../components/card";
-import { format } from "date-fns";
+import { format, isBefore } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
 
 const MyActHome = () => {
@@ -34,15 +34,17 @@ const MyActHome = () => {
 
           getDoc(docRef).then((docInf) => {
             if (docInf.exists()) {
-              dateTime = docInf.data().activityDatetime.toDate();
+              if (docInf.data().activityStatus === "active") {
+                dateTime = docInf.data().activityDatetime.toDate();
 
-              activity = docInf.data();
-              activity.id = docInf.id;
-              activity.activityDatetime = dateTime;
+                activity = docInf.data();
+                activity.id = docInf.id;
+                activity.activityDatetime = dateTime;
 
-              setMyActivity((myActivity) =>
-                Array.from(new Set([...myActivity, activity]))
-              );
+                setMyActivity((myActivity) =>
+                  Array.from(new Set([...myActivity, activity]))
+                );
+              }
             }
           });
         });
@@ -57,14 +59,38 @@ const MyActHome = () => {
     return () => unsubscribe();
   }, []);
 
+  /* In case you need it later; this is the code for checking if the activity is still ongoing or passed
+  if (
+    new Date().setHours(0, 0, 0, 0) <=
+    docInf.data().activityDatetime.toDate().setHours(0, 0, 0, 0)
+  ) {
+    dateTime = docInf.data().activityDatetime.toDate();
+
+    activity = docInf.data();
+    activity.id = docInf.id;
+    activity.activityDatetime = dateTime;
+
+    setMyActivity((myActivity) =>
+      Array.from(new Set([...myActivity, activity]))
+    );
+  } else {
+    console.log("Activity is over" + docInf.data().activityName);
+  }
+  */
+
   //Checking if the activity date is today
   const checkActivityDate = (activityId, activityDatetime) => {
     const today = new Date();
 
     if (format(activityDatetime, "dd MM") === format(today, "dd MM")) {
-      navigation.navigate("ScanCode", {
-        activityId: activityId,
-      });
+      if (today >= activityDatetime) {
+        //If the current time is more than the activity start time
+        navigation.navigate("ScanCode", {
+          activityId: activityId,
+        });
+      } else {
+        Alert.alert("This activity has not started yet!");
+      }
     } else {
       Alert.alert("This activity is not being held today!");
     }
@@ -107,7 +133,6 @@ const MyActHome = () => {
                 checkSession(item.id, item.activityDatetime);
               }}
             >
-              {/* TODO: DON'T ALLOW CHECK IN IF GOT ACTIVE SESSION */}
               <Text style={styles.buttonOutlineText}>Check In</Text>
             </TouchableOpacity>
           </Card>

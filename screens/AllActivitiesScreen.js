@@ -21,6 +21,7 @@ import {
   arrayUnion,
   increment,
   doc,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
@@ -36,11 +37,36 @@ const AllActivitiesScreen = () => {
   const [initializing, setInitializing] = React.useState(true);
 
   useEffect(() => {
-    getAllActivities();
+    const q = query(
+      activitiesRef,
+      where("activityStatus", "==", "active"),
+      orderBy("activityName", "asc")
+    );
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const activities = [];
+
+      querySnapshot.forEach((actDoc) => {
+        activities.push({
+          ...actDoc.data(),
+          id: actDoc.id,
+          activityDatetime: actDoc.data().activityDatetime.toDate(),
+        });
+      });
+
+      setActivities(activities);
+    });
+
+    if (initializing) setInitializing(false);
   }, []);
 
+  /*
   const getAllActivities = async () => {
-    const q = query(activitiesRef, orderBy("activityName", "asc"));
+    const q = query(
+      activitiesRef,
+      where("activityStatus", "==", "active"),
+      orderBy("activityName", "asc")
+    );
     const querySnapshot = await getDocs(q);
     const activity = [];
     var dateTime;
@@ -69,6 +95,7 @@ const AllActivitiesScreen = () => {
 
     if (initializing) setInitializing(false);
   };
+  */
 
   console.log(activities);
 
@@ -80,11 +107,10 @@ const AllActivitiesScreen = () => {
     );
   }
 
-  //TODO: Add handle for if the activity is full
-
   return (
     <View>
       <Text>Search Bar Here</Text>
+
       <FlatList
         data={activities}
         renderItem={({ item }) => (

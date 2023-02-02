@@ -69,27 +69,65 @@ async function leaveActivity(activityId) {
   await updateDoc(userRef, {
     //Removing the activity from myActivities array
     myActivities: arrayRemove(activityId),
-  }).then(() => {
-    //Incrementing the volunteer slot of the activity by 1
-    updateDoc(doc(db, "activities", activityId), {
-      volunteerSlot: increment(+1),
-    })
-      .then(() => {
-        //Deleting the respective volunteer participation document
-        getDocs(q).then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            deleteDoc(doc.ref);
-          });
+  })
+    .then(async () => {
+      const actRef = doc(db, "activities", activityId);
+      const docSnap = await getDoc(actRef);
+
+      //Checking if the activity was priorly full status
+      if (docSnap.data().activityStatus === "full") {
+        await updateDoc(actRef, {
+          activityStatus: "active",
+          volunteerSlot: increment(+1),
         });
-      })
-      .catch((error) => {
-        console.error("Error updating document: ", error);
-      })
-      .then(() => {
-        Alert.alert("You have successfully left the activity!");
+      } else {
+        await updateDoc(actRef, {
+          volunteerSlot: increment(+1),
+        });
+      }
+    })
+    .then(() => {
+      //Deleting the respective volunteer participation document
+      getDocs(q).then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          deleteDoc(doc.ref);
+        });
       });
-  });
+    })
+    .catch((error) => {
+      console.error("Error updating document: ", error);
+    })
+    .then(() => {
+      Alert.alert("You have successfully left the activity!");
+    });
 }
+
+const updateActivity = async (userRef, activityId) => {
+  await updateDoc(userRef, {
+    myActivities: arrayUnion(activityId),
+  })
+    .then(async () => {
+      const actRef = doc(db, "activities", activityId);
+      const docSnap = await getDoc(actRef);
+
+      if (docSnap.data().volunteerSlot === 1) {
+        await updateDoc(actRef, {
+          volunteerSlot: increment(-1),
+          activityStatus: "full",
+        });
+      } else {
+        await updateDoc(actRef, {
+          volunteerSlot: increment(-1),
+        });
+      }
+    })
+    .catch((error) => {
+      console.error("Error updating document: ", error);
+    })
+    .then(() => {
+      Alert.alert("You have successfully joined the activity!");
+    });
+};
 
 async function checkClash(item) {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
@@ -127,48 +165,14 @@ async function checkClash(item) {
         break;
       } else {
         if (i === docSnap.data().myActivities.length - 1) {
-          await updateDoc(userRef, {
-            myActivities: arrayUnion(item.id),
-          })
-            .then(() => {
-              updateDoc(doc(db, "activities", item.id), {
-                volunteerSlot: increment(-1),
-              })
-                .catch((error) => {
-                  console.error("Error updating document: ", error);
-                })
-                .then(() => {
-                  Alert.alert("You have successfully joined the activity!");
-                });
-            })
-            .catch((error) => {
-              console.error("Error adding document: ", error);
-            });
+          updateActivity(userRef, item.id);
         }
       }
     }
   } else {
     //the user has no pre-existing activities
-    await updateDoc(userRef, {
-      myActivities: arrayUnion(item.id),
-    })
-      .then(() => {
-        updateDoc(doc(db, "activities", item.id), {
-          volunteerSlot: increment(-1),
-        })
-          .catch((error) => {
-            console.error("Error updating document: ", error);
-          })
-          .then(() => {
-            Alert.alert("You have successfully joined the activity!");
-          });
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-      });
+    updateActivity(userRef, item.id);
   }
 }
-
-//TODO: Separate the update function
 
 export { joinActivity, leaveActivity, checkClash };

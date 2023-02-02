@@ -26,7 +26,7 @@ const DiscoverForumsScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [forums, setForums] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
   /*
   useLayoutEffect(() => {
     const forumsRef = collection(db, "forums");
@@ -58,7 +58,6 @@ const DiscoverForumsScreen = () => {
   }, []);
   */
   useLayoutEffect(() => {
-    setLoading(true);
     const forumsRef = collection(db, "forums");
     const qForum = query(forumsRef, orderBy("createdAt", "desc"));
 
@@ -82,10 +81,6 @@ const DiscoverForumsScreen = () => {
 
       setForums(forums);
     });
-
-    if (loading) {
-      setLoading(false);
-    }
 
     return () => unsubscribe();
   }, [isFocused]);
@@ -141,14 +136,6 @@ const DiscoverForumsScreen = () => {
       </View>
     );
   };
-
-  if (loading) {
-    return (
-      <View>
-        <Text>Loading...</Text>
-      </View>
-    );
-  }
 
   return (
     <View>
