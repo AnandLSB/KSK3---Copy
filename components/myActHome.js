@@ -11,8 +11,9 @@ import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
 import Card from "../components/card";
-import { format, isBefore } from "date-fns";
+import { format } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
+import { capitalizeWords } from "./activityFunc";
 
 const MyActHome = () => {
   const auth = getAuth();
@@ -126,7 +127,7 @@ const MyActHome = () => {
         data={myActivity}
         renderItem={({ item }) => (
           <Card>
-            <Text>{item.activityName}</Text>
+            <Text>{capitalizeWords(item.activityName)}</Text>
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
               onPress={() => {

@@ -175,4 +175,14 @@ async function checkClash(item) {
   }
 }
 
-export { joinActivity, leaveActivity, checkClash };
+const capitalizeWords = (activityName) => {
+  return activityName
+    .toLowerCase()
+    .split(" ")
+    .map((word) => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
+};
+
+export { joinActivity, leaveActivity, checkClash, capitalizeWords };

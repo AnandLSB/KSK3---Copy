@@ -27,7 +27,7 @@ import {
 import Card from "../components/card";
 import { format } from "date-fns";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
-import { leaveActivity } from "../components/activityFunc";
+import { leaveActivity, capitalizeWords } from "../components/activityFunc";
 
 const MyActivitiesScreen = () => {
   console.log("MyActivitiesScreen");
@@ -122,7 +122,7 @@ const MyActivitiesScreen = () => {
         data={activityInfo}
         renderItem={({ item }) => (
           <Card>
-            <Text>{item.activityName}</Text>
+            <Text>{capitalizeWords(item.activityName)}</Text>
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
             <TouchableOpacity
               onPress={() => {

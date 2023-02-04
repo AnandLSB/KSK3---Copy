@@ -5,6 +5,7 @@ import { getDoc, doc } from "@firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
+import { capitalizeWords } from "../components/activityFunc";
 
 const CompletedActivitiesScreen = () => {
   const auth = getAuth();
@@ -51,7 +52,7 @@ const CompletedActivitiesScreen = () => {
         data={completedActivities}
         renderItem={({ item }) => (
           <Card>
-            <Text>{item.activityName}</Text>
+            <Text>{capitalizeWords(item.activityName)}</Text>
             <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
           </Card>
         )}

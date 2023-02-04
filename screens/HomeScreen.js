@@ -29,7 +29,7 @@ import {
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
-import { joinActivity, checkClash } from "../components/activityFunc";
+import { joinActivity, capitalizeWords } from "../components/activityFunc";
 import { useIsFocused } from "@react-navigation/core";
 import MyActHome from "../components/myActHome";
 import MySession from "../components/mySession";
@@ -116,7 +116,9 @@ const HomeScreen = () => {
         renderItem={({ item }) => (
           <Card>
             <View style={styles.infoCont}>
-              <Text style={{ fontWeight: "bold" }}>{item.activityName}</Text>
+              <Text style={{ fontWeight: "bold" }}>
+                {capitalizeWords(item.activityName)}
+              </Text>
               <Text>Date: {format(item.activityDatetime, "dd MMM yyyy")}</Text>
               <Text>Time: {format(item.activityDatetime, "p")}</Text>
               <Text>Volunteer Slots: {item.volunteerSlot}</Text>

@@ -8,7 +8,6 @@ import {
   View,
   ActivityIndicator,
   FlatList,
-  Alert,
 } from "react-native";
 import {
   collection,
@@ -22,11 +21,18 @@ import {
   increment,
   doc,
   onSnapshot,
+  startAt,
+  endAt,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import { format } from "date-fns";
-import { joinActivity, checkClash } from "../components/activityFunc";
+import {
+  joinActivity,
+  checkClash,
+  capitalizeWords,
+} from "../components/activityFunc";
+import { search, SearchBar } from "../components/search";
 
 const AllActivitiesScreen = () => {
   console.log("AllActivitiesScreen");
@@ -35,6 +41,7 @@ const AllActivitiesScreen = () => {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [activities, setActivities] = React.useState([]);
   const [initializing, setInitializing] = React.useState(true);
+  const [searchText, setSearchText] = React.useState("");
 
   useEffect(() => {
     const q = query(
@@ -58,6 +65,8 @@ const AllActivitiesScreen = () => {
     });
 
     if (initializing) setInitializing(false);
+
+    return () => unsubscribe();
   }, []);
 
   /*
@@ -107,27 +116,35 @@ const AllActivitiesScreen = () => {
     );
   }
 
+  console.log(searchText);
+
   return (
     <View>
-      <Text>Search Bar Here</Text>
+      <SearchBar type={"activities"} setActivities={setActivities} />
 
-      <FlatList
-        data={activities}
-        renderItem={({ item }) => (
-          <Card>
-            <Text>{item.activityName}</Text>
-            <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
-            <TouchableOpacity
-              key={item.id}
-              onPress={() => {
-                joinActivity(item.id, item);
-              }}
-            >
-              <Text style={styles.buttonOutlineText}>Join</Text>
-            </TouchableOpacity>
-          </Card>
-        )}
-      />
+      {activities === null ? (
+        <Card>
+          <Text>No results</Text>
+        </Card>
+      ) : (
+        <FlatList
+          data={activities}
+          renderItem={({ item }) => (
+            <Card>
+              <Text>{capitalizeWords(item.activityName)}</Text>
+              <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => {
+                  joinActivity(item.id, item);
+                }}
+              >
+                <Text style={styles.buttonOutlineText}>Join</Text>
+              </TouchableOpacity>
+            </Card>
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -135,9 +152,23 @@ const AllActivitiesScreen = () => {
 export default AllActivitiesScreen;
 
 const styles = StyleSheet.create({
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: 5,
+  },
   buttonOutlineText: {
     color: "#0782F9",
     fontWeight: "700",
     fontSize: 16,
+  },
+  input: {
+    backgroundColor: "white",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 5,
+    width: "85%",
   },
 });

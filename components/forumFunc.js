@@ -125,7 +125,7 @@ const addForum = async (forumTitle, forumDesc) => {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
   await addDoc(forumRef, {
-    title: forumTitle,
+    title: forumTitle.toLowerCase(),
     desc: forumDesc,
     createdBy: auth.currentUser.uid,
     createdAt: serverTimestamp(),
@@ -214,6 +214,37 @@ const createForumReport = async (forumId, reportText) => {
     });
 };
 
+const getForumAuthor = async (userID) => {
+  var author;
+
+  if (userID !== auth.currentUser.uid) {
+    const userRef = doc(db, "volunteer", userID);
+
+    await getDoc(userRef).then((userDoc) => {
+      author = userDoc.data().Username;
+    });
+  } else {
+    author = "You";
+  }
+
+  return author;
+};
+
+const getJoinedStatus = async (forumID) => {
+  const myRef = doc(db, "volunteer", auth.currentUser.uid);
+  var joined;
+
+  await getDoc(myRef).then((myDoc) => {
+    if (myDoc.data().myForums.includes(forumID)) {
+      joined = true;
+    } else {
+      joined = false;
+    }
+  });
+
+  return joined;
+};
+
 export {
   joinForum,
   leaveForum,
@@ -224,4 +255,6 @@ export {
   editForum,
   deleteForum,
   createForumReport,
+  getForumAuthor,
+  getJoinedStatus,
 };

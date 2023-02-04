@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  TextInput,
 } from "react-native";
 import React, { useLayoutEffect, useEffect } from "react";
 import {
@@ -19,6 +20,8 @@ import Card from "../components/card";
 import { getAuth } from "firebase/auth";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { joinForum } from "../components/forumFunc";
+import { SearchBar } from "../components/search";
+import { capitalizeWords } from "../components/activityFunc";
 
 const DiscoverForumsScreen = () => {
   console.log("DiscoverForumsScreen");
@@ -85,7 +88,7 @@ const DiscoverForumsScreen = () => {
     return () => unsubscribe();
   }, [isFocused]);
 
-  forums.sort((a, b) => {
+  forums?.sort((a, b) => {
     return b.createdAt - a.createdAt;
   });
 
@@ -140,34 +143,61 @@ const DiscoverForumsScreen = () => {
   return (
     <View>
       <Text>DiscoverForumsScreen</Text>
+      <SearchBar type={"forums"} setForums={setForums} />
 
-      <FlatList
-        data={forums}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("ForumDetails", {
-                forumId: item.id,
-              });
-            }}
-          >
-            <Card>
-              <View>
-                <Text>{item.title}</Text>
-                <Text>{item.desc}</Text>
-                <Text>{item.createdBy}</Text>
-                <Text>{JSON.stringify(item.joined)}</Text>
-              </View>
-              {item.joined ? null : <JoinButton forumId={item.id} />}
-            </Card>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id}
-      />
+      {forums === null ? (
+        <Card>
+          <Text>No results</Text>
+        </Card>
+      ) : (
+        <FlatList
+          data={forums}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("ForumDetails", {
+                  forumId: item.id,
+                });
+              }}
+            >
+              <Card>
+                <View>
+                  <Text>{capitalizeWords(item.title)}</Text>
+                  <Text>{item.desc}</Text>
+                  <Text>{item.createdBy}</Text>
+                  <Text>{JSON.stringify(item.joined)}</Text>
+                </View>
+                {item.joined ? null : <JoinButton forumId={item.id} />}
+              </Card>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      )}
     </View>
   );
 };
 
 export default DiscoverForumsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: 5,
+  },
+  buttonOutlineText: {
+    color: "#0782F9",
+    fontWeight: "700",
+    fontSize: 16,
+  },
+  input: {
+    backgroundColor: "white",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginTop: 5,
+    width: "85%",
+  },
+});

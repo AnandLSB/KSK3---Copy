@@ -19,7 +19,9 @@ import { db } from "../config/firebase";
 import Card from "../components/card";
 import { useNavigation, useIsFocused } from "@react-navigation/native";
 import { leaveForum, addForum } from "../components/forumFunc";
+import { capitalizeWords } from "../components/activityFunc";
 import Dialog from "react-native-dialog";
+import { SearchBar } from "../components/search";
 
 const JoinedForumsScreen = () => {
   const auth = getAuth();
@@ -32,46 +34,6 @@ const JoinedForumsScreen = () => {
 
   const [forumTitle, setForumTitle] = React.useState("");
   const [forumDesc, setForumDesc] = React.useState("");
-  /*
-  useLayoutEffect(() => {
-    const unsubscribe = onSnapshot(userRef, (forumDoc) => {
-      setJoinedForums([]);
-
-      if (forumDoc.data().myForums.length > 0) {
-        forumDoc.get("myForums").forEach((item) => {
-          let docRef = doc(db, "forums", item);
-          var forum = {};
-
-          getDoc(docRef).then((docInf) => {
-            if (docInf.exists()) {
-              let userRef = doc(db, "volunteer", docInf.data().createdBy);
-
-              getDoc(userRef)
-                .then((docUser) => {
-                  forum = docInf.data();
-                  forum.id = docInf.id;
-                  forum.createdAt = docInf
-                    .data({ serverTimestamps: "estimate" })
-                    .createdAt.toDate();
-
-                  if (docInf.data().createdBy === auth.currentUser.uid) {
-                    forum.createdBy = "You";
-                  } else {
-                    forum.createdBy = docUser.data().Username;
-                  }
-                })
-                .finally(() => {
-                  setJoinedForums((joinedForums) => [...joinedForums, forum]);
-                });
-            }
-          });
-        });
-      }
-    });
-
-    return () => unsubscribe();
-  }, [isFocused]);
-  */
 
   useLayoutEffect(() => {
     const unsubscribe = onSnapshot(userRef, (snapshot) => {
@@ -133,7 +95,7 @@ const JoinedForumsScreen = () => {
     return author;
   };
 
-  joinedForums.sort((a, b) => {
+  joinedForums?.sort((a, b) => {
     return b.updatedAt - a.updatedAt;
   });
 
@@ -144,9 +106,6 @@ const JoinedForumsScreen = () => {
       </View>
     );
   }
-
-  //TODO: Show recent posts for each forum
-  //TODO: Sort alphabetically or by update timestamp?
 
   return (
     <View>
@@ -180,6 +139,12 @@ const JoinedForumsScreen = () => {
       </View>
 
       <Text>JoinedForumsScreen</Text>
+      <SearchBar
+        type={"myForums"}
+        setJoinedForums={setJoinedForums}
+        joinedForums={joinedForums}
+      />
+
       <TouchableOpacity
         onPress={() => {
           setModalVisible(true);
@@ -187,35 +152,41 @@ const JoinedForumsScreen = () => {
       >
         <Text>Create Forum</Text>
       </TouchableOpacity>
-      <FlatList
-        data={joinedForums}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("ForumDetails", {
-                forumId: item.id,
-              });
-            }}
-          >
-            <Card>
-              <View>
-                <Text>{item.id}</Text>
-                <Text>Title: {item.title}</Text>
-                <Text>Desc: {item.desc}</Text>
-                <Text>Created By: {item.createdBy}</Text>
-              </View>
-              {/* Maybe add a recent message component onSnapshot for each forum */}
-              <TouchableOpacity
-                onPress={() => {
-                  leaveForum(item.id);
-                }}
-              >
-                <Text>Leave</Text>
-              </TouchableOpacity>
-            </Card>
-          </TouchableOpacity>
-        )}
-      />
+      {joinedForums === null ? (
+        <Card>
+          <Text>No results</Text>
+        </Card>
+      ) : (
+        <FlatList
+          data={joinedForums}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("ForumDetails", {
+                  forumId: item.id,
+                });
+              }}
+            >
+              <Card>
+                <View>
+                  <Text>{item.id}</Text>
+                  <Text>Title: {capitalizeWords(item.title)}</Text>
+                  <Text>Desc: {item.desc}</Text>
+                  <Text>Created By: {item.createdBy}</Text>
+                </View>
+                {/* Maybe add a recent message component onSnapshot for each forum */}
+                <TouchableOpacity
+                  onPress={() => {
+                    leaveForum(item.id);
+                  }}
+                >
+                  <Text>Leave</Text>
+                </TouchableOpacity>
+              </Card>
+            </TouchableOpacity>
+          )}
+        />
+      )}
     </View>
   );
 };
