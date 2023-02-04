@@ -35,7 +35,10 @@ const MyActHome = () => {
 
           getDoc(docRef).then((docInf) => {
             if (docInf.exists()) {
-              if (docInf.data().activityStatus === "active") {
+              if (
+                docInf.data().activityStatus === "active" ||
+                docInf.data().activityStatus === "full"
+              ) {
                 dateTime = docInf.data().activityDatetime.toDate();
 
                 activity = docInf.data();

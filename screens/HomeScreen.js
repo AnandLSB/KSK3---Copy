@@ -52,6 +52,7 @@ const HomeScreen = () => {
 
   const qAll = query(
     allActivitiesRef,
+    where("activityStatus", "==", "active"),
     where("volunteerSlot", ">", 0),
     orderBy("volunteerSlot", "desc"),
     orderBy("createdAt", "desc"),

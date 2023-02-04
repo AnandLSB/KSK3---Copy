@@ -39,6 +39,7 @@ const MyActivitiesScreen = () => {
   const [activityInfo, setActivityInfo] = React.useState([]);
   const [hasActivity, setHasActivity] = React.useState(false);
   const [initializing, setInitializing] = React.useState(true);
+  const [inactiveAct, setInactiveAct] = React.useState([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(userRef, (docMy) => {
@@ -56,15 +57,24 @@ const MyActivitiesScreen = () => {
 
           getDoc(docRef).then((docInf) => {
             if (docInf.exists()) {
-              dateTime = docInf.data().activityDatetime.toDate();
+              if (
+                docInf.data().activityStatus === "active" ||
+                docInf.data().activityStatus === "full"
+              ) {
+                dateTime = docInf.data().activityDatetime.toDate();
 
-              activity = docInf.data();
-              activity.Id = docInf.id;
-              activity.activityDatetime = dateTime;
+                activity = docInf.data();
+                activity.Id = docInf.id;
+                activity.activityDatetime = dateTime;
 
-              setActivityInfo((activityInfo) =>
-                Array.from(new Set([...activityInfo, activity]))
-              );
+                setActivityInfo((activityInfo) =>
+                  Array.from(new Set([...activityInfo, activity]))
+                );
+              } else {
+                setInactiveAct((inactiveAct) =>
+                  Array.from(new Set([...inactiveAct, docInf.id]))
+                );
+              }
             }
           });
         });
@@ -76,6 +86,29 @@ const MyActivitiesScreen = () => {
     });
 
     if (initializing) setInitializing(false);
+
+    if (inactiveAct.length > 0) {
+      Alert.alert(
+        "Inactive Activities Found",
+        "Would you like to remove them from your activities?",
+        [
+          {
+            text: "Yes",
+            onPress: () => {
+              inactiveAct.forEach(async (item) => {
+                await updateDoc(userRef, {
+                  myActivities: arrayRemove(item),
+                });
+              });
+              setInactiveAct([]);
+            },
+          },
+          {
+            text: "No",
+          },
+        ]
+      );
+    }
 
     return () => unsubscribe();
   }, []);
