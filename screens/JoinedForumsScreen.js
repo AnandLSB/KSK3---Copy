@@ -4,6 +4,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useLayoutEffect } from "react";
 import {
@@ -30,7 +31,7 @@ const JoinedForumsScreen = () => {
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [joinedForums, setJoinedForums] = React.useState([]);
   const [modalVisible, setModalVisible] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
 
   const [forumTitle, setForumTitle] = React.useState("");
   const [forumDesc, setForumDesc] = React.useState("");
@@ -51,6 +52,8 @@ const JoinedForumsScreen = () => {
         });
       }
     });
+
+    if (loading) setLoading(false);
 
     return () => unsubscribe();
   }, [isFocused]);
@@ -101,8 +104,8 @@ const JoinedForumsScreen = () => {
 
   if (loading) {
     return (
-      <View>
-        <Text>Loading...</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
       </View>
     );
   }

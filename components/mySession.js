@@ -17,6 +17,7 @@ import { db } from "../config/firebase";
 import Card from "./card";
 import { format } from "date-fns";
 import { useNavigation } from "@react-navigation/native";
+import { capitalizeWords } from "./activityFunc";
 
 const MySession = () => {
   const auth = getAuth();
@@ -125,28 +126,34 @@ const MySession = () => {
       });
   };
 
-  //TODO: Add ternary operator based on whether the user has a session or not
-  //TODO: Add ternary operator to display beneficiary form button if the category = food bank
   return (
     <View>
-      <Card>
-        <View>
-          <Text>{mySession.id}</Text>
-          <Text>{mySession.activityName}</Text>
-          <Text>{mySession.checkInTime}</Text>
-          <Text>{mySession.volunPartId}</Text>
-          {mySession.activityCategory == "Food Bank" ? (
-            <View>
-              <TouchableOpacity onPress={() => navigation.navigate("BeneForm")}>
-                <Text>Beneficiary Form</Text>
-              </TouchableOpacity>
-            </View>
-          ) : null}
-        </View>
-        <TouchableOpacity onPress={() => registerCheckOut()}>
-          <Text>Check Out</Text>
-        </TouchableOpacity>
-      </Card>
+      {hasSession ? (
+        <Card>
+          <View>
+            <Text>{mySession.id}</Text>
+            <Text>{capitalizeWords(mySession.activityName)}</Text>
+            <Text>{mySession.checkInTime}</Text>
+            <Text>{mySession.volunPartId}</Text>
+            {mySession.activityCategory == "Food Bank" ? (
+              <View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("BeneForm")}
+                >
+                  <Text>Beneficiary Form</Text>
+                </TouchableOpacity>
+              </View>
+            ) : null}
+          </View>
+          <TouchableOpacity onPress={() => registerCheckOut()}>
+            <Text>Check Out</Text>
+          </TouchableOpacity>
+        </Card>
+      ) : (
+        <Card>
+          <Text>No Active Volunteer Session</Text>
+        </Card>
+      )}
     </View>
   );
 };

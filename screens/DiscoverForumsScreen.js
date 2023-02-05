@@ -5,6 +5,7 @@ import {
   FlatList,
   TouchableOpacity,
   TextInput,
+  ActivityIndicator,
 } from "react-native";
 import React, { useLayoutEffect, useEffect } from "react";
 import {
@@ -29,7 +30,7 @@ const DiscoverForumsScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const [forums, setForums] = React.useState([]);
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
   /*
   useLayoutEffect(() => {
     const forumsRef = collection(db, "forums");
@@ -85,6 +86,8 @@ const DiscoverForumsScreen = () => {
       setForums(forums);
     });
 
+    if (loading) setLoading(false);
+
     return () => unsubscribe();
   }, [isFocused]);
 
@@ -139,6 +142,14 @@ const DiscoverForumsScreen = () => {
       </View>
     );
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
   return (
     <View>
