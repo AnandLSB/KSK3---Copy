@@ -1,10 +1,13 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, Image } from "react-native";
 import React from "react";
 
 const Splash = () => {
   return (
     <View style={styles.container}>
-      <Text>Splash</Text>
+      <Image
+        source={require("../assets/kskLogo.png")}
+        style={{ width: 165, height: 165 }}
+      />
     </View>
   );
 };
@@ -16,5 +19,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#e55039",
   },
 });

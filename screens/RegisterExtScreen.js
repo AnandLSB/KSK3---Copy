@@ -6,6 +6,7 @@ import {
   TextInput,
   ScrollView,
   StatusBar,
+  Button,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -17,6 +18,8 @@ import { db } from "../config/firebase";
 import { collection, addDoc, setDoc, doc } from "firebase/firestore";
 import { StackActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { format } from "date-fns";
 
 const RegisterExtScreen = ({ route }) => {
   const auth = getAuth();
@@ -33,6 +36,26 @@ const RegisterExtScreen = ({ route }) => {
   const [emergencyContact, setEmergencyContact] = useState("");
   const [kskLocation, setKskLocation] = useState("");
   const accountCreationDate = Date().toString();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [date, setDate] = useState("Birthdate");
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.log(
+      "A date has been picked: ",
+      new Date(date.setHours(0, 0, 0, 0))
+    );
+    setDate(format(new Date(date.setHours(0, 0, 0, 0)), "dd MMM yyyy"));
+    hideDatePicker();
+  };
+
   /*
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -117,10 +140,6 @@ const RegisterExtScreen = ({ route }) => {
   };
 
   return (
-    //passed variables from RegisterScreen
-    //then we call the register function etc here
-    //then once they login they will go to the unverified stack
-
     <View style={styles.container}>
       <View style={{ alignItems: "center", padding: 10 }}>
         <Text style={[styles.text, { fontSize: 16, fontWeight: "700" }]}>
@@ -137,6 +156,13 @@ const RegisterExtScreen = ({ route }) => {
           password!
         </Text>
       </View>
+
+      <DateTimePickerModal
+        isVisible={isDatePickerVisible}
+        mode="date"
+        onConfirm={handleConfirm}
+        onCancel={hideDatePicker}
+      />
 
       <View style={styles.inputContainer}>
         <ScrollView>
@@ -164,12 +190,14 @@ const RegisterExtScreen = ({ route }) => {
             onChangeText={(text) => setNationality(text)}
             style={styles.input}
           />
-          <TextInput
-            placeholder="Birthdate"
-            value={birthdate}
-            onChangeText={(text) => setBirthdate(text)}
-            style={styles.input}
-          />
+
+          <View style={[styles.section, styles.input, { paddingVertical: 15 }]}>
+            <Text style={{ color: "#808080" }}>{date}</Text>
+            <TouchableOpacity onPress={showDatePicker}>
+              <Text>Date</Text>
+            </TouchableOpacity>
+          </View>
+
           <TextInput
             placeholder="Home Address"
             value={homeAddress}
@@ -224,7 +252,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-
     backgroundColor: "#e55039",
   },
   buttonContainer: {
@@ -267,5 +294,14 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginTop: 20,
   },
 });
