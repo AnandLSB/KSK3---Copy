@@ -21,7 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 const RegisterExtScreen = ({ route }) => {
   const auth = getAuth();
   const { name, email, password } = route.params;
-  const firstName = name.replace(/ .*/, "");
+  const username = name.replace(/ .*/, "");
   const navigation = useNavigation();
 
   const [fullName, setFullName] = useState("");
@@ -33,7 +33,7 @@ const RegisterExtScreen = ({ route }) => {
   const [emergencyContact, setEmergencyContact] = useState("");
   const [kskLocation, setKskLocation] = useState("");
   const accountCreationDate = Date().toString();
-
+  /*
   const handleSignUp = () => {
     createUserWithEmailAndPassword(auth, email, password)
       .catch((error) => {
@@ -71,6 +71,50 @@ const RegisterExtScreen = ({ route }) => {
         });
       });
   };
+  */
+  const handleSignUp = async () => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        alert("That email address is already in use!");
+      } else if (error.code === "auth/invalid-email") {
+        alert("That email address is invalid!");
+      } else {
+        alert(error.message);
+      }
+
+      return;
+    }
+
+    await setDoc(doc(db, "volunteer", auth.currentUser.uid), {
+      Username: name,
+      fullName: fullName,
+      icNumber: icNumber,
+      phoneNumber: phoneNumber,
+      nationality: nationality,
+      birthdate: birthdate,
+      homeAddress: homeAddress,
+      emergencyContact: emergencyContact,
+      kskLocation: kskLocation,
+      accountCreationDate: accountCreationDate,
+      profilePic:
+        "https://firebasestorage.googleapis.com/v0/b/kskfyp.appspot.com/o/default%2Fuser.png?alt=media&token=394cb43f-30b0-4e40-81fa-0b220d6e121c",
+      myActivities: [],
+      myForums: [],
+      myCompleteAct: [],
+      mySession: null,
+    }).catch((error) => {
+      alert(error.message);
+    });
+
+    await sendEmailVerification(auth.currentUser, {
+      url: "https://kskfyp.firebaseapp.com",
+      handleCodeInApp: true,
+    }).catch((error) => {
+      alert(error.message);
+    });
+  };
 
   return (
     //passed variables from RegisterScreen
@@ -78,14 +122,21 @@ const RegisterExtScreen = ({ route }) => {
     //then once they login they will go to the unverified stack
 
     <View style={styles.container}>
-      <Text>Hello {firstName}!</Text>
-      <Text>You are registering with the email: {email}!</Text>
-      <Text>Password: {password}</Text>
-      <Text>Please complete the form below to register!</Text>
-      <Text>
-        Click the back button if you would like to change name email or
-        password?
-      </Text>
+      <View style={{ alignItems: "center", padding: 10 }}>
+        <Text style={[styles.text, { fontSize: 16, fontWeight: "700" }]}>
+          Hello {username}!
+        </Text>
+        <Text style={styles.text}>
+          You are registering with the email:{" "}
+          <Text style={{ fontWeight: "bold" }}>{email}</Text>!
+        </Text>
+
+        <Text style={[styles.text, { marginTop: 10, textAlign: "center" }]}>
+          Please complete the volunteer form below to register or click the back
+          button below if you would like make changes to your name, email or
+          password!
+        </Text>
+      </View>
 
       <View style={styles.inputContainer}>
         <ScrollView>
@@ -173,7 +224,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: StatusBar.currentHeight,
+
+    backgroundColor: "#e55039",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -181,7 +233,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 30,
   },
   button: {
     flex: 1,
@@ -192,13 +244,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonOutline: {
-    backgroundColor: "white",
+    backgroundColor: "#F9E7E8",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -212,5 +264,8 @@ const styles = StyleSheet.create({
   inputContainer: {
     flex: 1,
     width: "95%",
+  },
+  text: {
+    color: "white",
   },
 });

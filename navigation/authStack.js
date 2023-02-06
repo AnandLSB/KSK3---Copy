@@ -13,8 +13,20 @@ export default function AuthStack() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
+          options={{
+            headerTransparent: true,
+            headerTitle: "",
+            headerTintColor: "white",
+          }}
+        />
         <Stack.Screen
           name="RegisterExt"
           component={RegisterExtScreen}

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
   Alert,
+  Image,
 } from "react-native";
 import { auth } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -42,7 +43,15 @@ const LoginScreen = () => {
       .then(() => {
         subscribeForums(auth.currentUser.uid);
       })
-      .catch((error) => alert(error.message));
+      .catch((error) => {
+        if (error.code === "auth/user-not-found") {
+          Alert.alert("Error!", "User not found");
+        } else if (error.code === "auth/wrong-password") {
+          Alert.alert("Error!", "Wrong password");
+        } else {
+          alert(error.message);
+        }
+      });
   };
 
   const handlePassReset = () => {
@@ -57,6 +66,19 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.container}>
+      <View style={{ alignItems: "center", marginBottom: 40 }}>
+        <Image
+          source={require("../assets/kskLogo.png")}
+          style={{ width: 165, height: 165 }}
+        />
+        <Text style={{ color: "white", fontWeight: "bold", fontSize: 17 }}>
+          Kechara Soup Kitchen
+        </Text>
+        <Text style={{ color: "white", fontWeight: "normal" }}>
+          Login as a Volunteer at Kechara Soup Kitchen
+        </Text>
+      </View>
+
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Email"
@@ -86,19 +108,23 @@ const LoginScreen = () => {
         >
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Register")}
-          style={[styles.button, styles.buttonOutline]}
-        >
-          <Text style={styles.buttonOutlineText}>Register Account</Text>
-        </TouchableOpacity>
+
+        <View style={styles.section}>
+          <Text style={styles.text}>Don't Have an Account?</Text>
+          <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+            <Text style={{ fontWeight: "bold", color: "#FFFFFF" }}>
+              Register
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           onPress={() => {
             if (email === "") {
               Alert.alert("Error!", "Please fill in your email");
             } else {
               Alert.alert(
-                "Are you sure?",
+                "Reset Password?",
                 "A password reset email will be sent to your email address!",
                 [
                   {
@@ -110,9 +136,10 @@ const LoginScreen = () => {
               );
             }
           }}
-          style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonOutlineText}>Forgot Password</Text>
+          <Text style={{ fontWeight: "bold", color: "#FFFFFF" }}>
+            Forgot Password
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -126,6 +153,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#e55039",
   },
   inputContainer: {
     width: "80%",
@@ -142,9 +170,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 40,
+    marginBottom: 40,
   },
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#F9E7E8",
     width: "100%",
     padding: 15,
     borderRadius: 10,
@@ -157,13 +186,25 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
   buttonText: {
-    color: "white",
-    fontWeight: "700",
+    color: "#20130B",
+    fontWeight: "500",
     fontSize: 16,
   },
   buttonOutlineText: {
     color: "#0782F9",
     fontWeight: "700",
     fontSize: 16,
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    padding: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    marginTop: 20,
+  },
+  text: {
+    color: "#FFFFFF",
   },
 });

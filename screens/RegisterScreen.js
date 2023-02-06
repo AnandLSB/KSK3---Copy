@@ -7,6 +7,7 @@ import {
   View,
   Alert,
   ScrollView,
+  Image,
 } from "react-native";
 import {
   getAuth,
@@ -55,7 +56,20 @@ const RegisterScreen = () => {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <View style={styles.container}>
+      <View style={{ alignItems: "center", marginBottom: 40 }}>
+        <Image
+          source={require("../assets/kskLogo.png")}
+          style={{ width: 165, height: 165 }}
+        />
+        <Text style={{ color: "white", fontWeight: "bold", fontSize: 17 }}>
+          Kechara Soup Kitchen
+        </Text>
+        <Text style={{ color: "white", fontWeight: "normal" }}>
+          Register as a Volunteer at Kechara Soup Kitchen
+        </Text>
+      </View>
+
       <View style={styles.inputContainer}>
         <TextInput
           placeholder="Username"
@@ -98,16 +112,18 @@ const RegisterScreen = () => {
               Alert.alert("Error!", "Passwords do not match");
             } else if (!validator.validate(email)) {
               Alert.alert("Error!", "Please enter a valid email address");
+            } else if (password.length < 6) {
+              Alert.alert("Error!", "Password must be at least 6 characters");
             } else {
               checkUsername();
             }
           }}
-          style={[styles.button, styles.buttonOutline]}
+          style={[styles.button]}
         >
           <Text style={styles.buttonOutlineText}>Register</Text>
         </TouchableOpacity>
       </View>
-    </KeyboardAvoidingView>
+    </View>
   );
 };
 
@@ -118,6 +134,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#e55039",
   },
   inputContainer: {
     width: "80%",
@@ -130,13 +147,14 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonContainer: {
-    width: "80%",
+    width: "60%",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 20,
+    marginTop: 40,
+    marginBottom: 50,
   },
   button: {
-    backgroundColor: "#0782F9",
+    backgroundColor: "#F9E7E8",
     width: "100%",
     padding: 15,
     borderRadius: 10,
@@ -145,7 +163,7 @@ const styles = StyleSheet.create({
   buttonOutline: {
     backgroundColor: "white",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonText: {
@@ -154,8 +172,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonOutlineText: {
-    color: "#0782F9",
-    fontWeight: "700",
+    color: "black",
+    fontWeight: "500",
     fontSize: 16,
   },
 });
