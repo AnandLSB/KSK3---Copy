@@ -62,14 +62,16 @@ const HomeScreen = () => {
   useEffect(() => {
     const unsubscribe = onSnapshot(qAll, (querySnapshotAll) => {
       setActivity([]);
-      var allDateTime;
+      var allDateTime, allDateTimeEnd;
       var allAct = {};
 
       querySnapshotAll.forEach((docAll) => {
         allDateTime = docAll.data().activityDatetime.toDate();
+        allDateTimeEnd = docAll.data().activityDatetimeEnd.toDate();
 
         allAct = docAll.data();
         allAct.activityDatetime = allDateTime;
+        allAct.activityDatetimeEnd = allDateTimeEnd;
         allAct.id = docAll.id;
 
         setActivity((allActivity) => [...allActivity, allAct]);
@@ -80,9 +82,6 @@ const HomeScreen = () => {
 
     return () => unsubscribe();
   }, []);
-
-  //console.log(myActivity);
-  //console.log(allActivity);
 
   if (initializing) {
     return (
@@ -99,6 +98,7 @@ const HomeScreen = () => {
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>Volunteer Session</Text>
       </View>
+
       <MySession />
 
       <View style={styles.section}>
@@ -108,20 +108,27 @@ const HomeScreen = () => {
             navigation.navigate("AllActivities");
           }}
         >
-          <Text style={styles.buttonOutlineText}>View All</Text>
+          <Text style={styles.buttonOutlineTextSection}>View All</Text>
         </TouchableOpacity>
       </View>
-      {/*TODO: Restructure activities to show start date and end date, same for time */}
+
       <FlatList
         data={allActivity}
+        style={{ flexGrow: 0, height: "35%" }}
         renderItem={({ item }) => (
           <Card>
             <View style={styles.infoCont}>
               <Text style={{ fontWeight: "bold" }}>
                 {capitalizeWords(item.activityName)}
               </Text>
-              <Text>Date: {format(item.activityDatetime, "dd MMM yyyy")}</Text>
-              <Text>Time: {format(item.activityDatetime, "p")}</Text>
+              <Text>
+                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetime, "p")}
+              </Text>
+              <Text>
+                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetimeEnd, "p")}
+              </Text>
               <Text>Volunteer Slots: {item.volunteerSlot}</Text>
               <Text>Category: {item.activityCategory}</Text>
             </View>
@@ -138,14 +145,6 @@ const HomeScreen = () => {
         )}
       />
 
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("BeneForm");
-        }}
-      >
-        <Text style={styles.buttonOutlineText}>Beneficiary Form</Text>
-      </TouchableOpacity>
-
       <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>My Upcoming Activities</Text>
       </View>
@@ -159,6 +158,7 @@ export default HomeScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   button: {
     backgroundColor: "#0782F9",
@@ -174,9 +174,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
+  },
+  buttonOutlineTextSection: {
+    color: "#EB4335",
+    fontWeight: "700",
+    fontSize: 14,
   },
   section: {
     flexDirection: "row",
@@ -184,7 +189,6 @@ const styles = StyleSheet.create({
     width: "100%",
     padding: 5,
   },
-  infoCont: {},
   buttonCont: {
     justifyContent: "center",
     alignItems: "center",

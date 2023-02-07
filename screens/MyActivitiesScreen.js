@@ -148,7 +148,7 @@ const MyActivitiesScreen = () => {
           navigation.navigate("CompletedActivities");
         }}
       >
-        <Text>Completed Activities</Text>
+        <Text>My Completed Activities</Text>
       </TouchableOpacity>
 
       <FlatList

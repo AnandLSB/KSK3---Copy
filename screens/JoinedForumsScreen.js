@@ -23,6 +23,7 @@ import { leaveForum, addForum } from "../components/forumFunc";
 import { capitalizeWords } from "../components/activityFunc";
 import Dialog from "react-native-dialog";
 import { SearchBar } from "../components/search";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const JoinedForumsScreen = () => {
   const auth = getAuth();
@@ -49,11 +50,12 @@ const JoinedForumsScreen = () => {
 
         getForumData(joinedForums).then((joinedForumsData) => {
           setJoinedForums(joinedForumsData);
+          if (loading) setLoading(false);
         });
+      } else {
+        setJoinedForums(null);
       }
     });
-
-    if (loading) setLoading(false);
 
     return () => unsubscribe();
   }, [isFocused]);
@@ -111,7 +113,7 @@ const JoinedForumsScreen = () => {
   }
 
   return (
-    <View>
+    <View style={styles.container}>
       <View>
         <Dialog.Container visible={modalVisible}>
           <Dialog.Title>Create a Forum</Dialog.Title>
@@ -141,23 +143,15 @@ const JoinedForumsScreen = () => {
         </Dialog.Container>
       </View>
 
-      <Text>JoinedForumsScreen</Text>
       <SearchBar
         type={"myForums"}
         setJoinedForums={setJoinedForums}
         joinedForums={joinedForums}
       />
 
-      <TouchableOpacity
-        onPress={() => {
-          setModalVisible(true);
-        }}
-      >
-        <Text>Create Forum</Text>
-      </TouchableOpacity>
       {joinedForums === null ? (
         <Card>
-          <Text>No results</Text>
+          <Text>No Joined Forum Results</Text>
         </Card>
       ) : (
         <FlatList
@@ -167,12 +161,13 @@ const JoinedForumsScreen = () => {
               onPress={() => {
                 navigation.navigate("ForumDetails", {
                   forumId: item.id,
+                  forumTitle: item.title,
+                  createdBy: item.createdBy,
                 });
               }}
             >
               <Card>
                 <View>
-                  <Text>{item.id}</Text>
                   <Text>Title: {capitalizeWords(item.title)}</Text>
                   <Text>Desc: {item.desc}</Text>
                   <Text>Created By: {item.createdBy}</Text>
@@ -190,10 +185,33 @@ const JoinedForumsScreen = () => {
           )}
         />
       )}
+
+      <TouchableOpacity
+        style={styles.fab}
+        onPress={() => {
+          setModalVisible(true);
+        }}
+      >
+        <Ionicons name="add-circle" size={45} color="black" />
+      </TouchableOpacity>
     </View>
   );
 };
 
 export default JoinedForumsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  fab: {
+    position: "absolute",
+    width: 60,
+    height: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    right: 10,
+    bottom: 10,
+  },
+});

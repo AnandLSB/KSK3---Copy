@@ -12,6 +12,7 @@ import React, { useState } from "react";
 import { db } from "../config/firebase";
 import { useNavigation, StackActions } from "@react-navigation/native";
 import { getAuth } from "firebase/auth";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const BeneFormScreen = () => {
   const navigation = useNavigation();
@@ -47,7 +48,13 @@ const BeneFormScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Beneficiary Form</Text>
+      <View style={{ padding: 20 }}>
+        <Text style={{ fontWeight: "500" }}>
+          Please fill in the fields below to a submit beneficiary information
+          for the Kechara Soup Kitchen Food Bank!
+        </Text>
+      </View>
+
       <View style={styles.inputContainer}>
         <ScrollView>
           <TextInput
@@ -56,30 +63,45 @@ const BeneFormScreen = () => {
             onChangeText={(text) => setFirstName(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="Last Name"
             value={lastName}
             onChangeText={(text) => setLastName(text)}
             style={styles.input}
           />
-          <TextInput
-            placeholder="Category"
-            value={category}
-            onChangeText={(text) => setCategory(text)}
-            style={styles.input}
+
+          <SelectList
+            placeholder={<Text style={{ color: "#808080" }}>Category</Text>}
+            setSelected={(val) => {
+              setCategory(val);
+            }}
+            search={false}
+            data={[
+              { key: "1", value: "Single Parent" },
+              { key: "2", value: "Elderly Living Alone" },
+              { key: "3", value: "Disabled (OKU)" },
+              { key: "4", value: "Orang Asli Community" },
+            ]}
+            save="value"
+            boxStyles={{ backgroundColor: "#E9ECEF", marginTop: 10 }}
+            dropdownStyles={{ backgroundColor: "#E9ECEF" }}
           />
+
           <TextInput
             placeholder="House Address"
             value={houseAddress}
             onChangeText={(text) => setHouseAddress(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="No Of Family Members"
             value={noOfFamilyMembers}
             onChangeText={(text) => setNoOfFamilyMembers(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="Remarks"
             value={remarks}
@@ -128,7 +150,7 @@ const BeneFormScreen = () => {
           }}
           style={[styles.button, styles.buttonOutline]}
         >
-          <Text style={styles.buttonOutlineText}>Save</Text>
+          <Text style={styles.buttonOutlineText}>Submit</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -142,6 +164,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
   },
   inputContainer: {
     flex: 1,
@@ -166,21 +189,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonOutline: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
     fontSize: 16,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
-    marginTop: 5,
+    marginTop: 10,
   },
 });

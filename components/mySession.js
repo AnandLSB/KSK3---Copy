@@ -42,7 +42,7 @@ const MySession = () => {
         );
         var activitySess = {};
         var dateTime;
-        var checkInTime;
+        var checkInTime, checkInDate;
         var volunPartId;
 
         getDocs(qPart)
@@ -54,6 +54,12 @@ const MySession = () => {
                   .data({ serverTimestamps: "estimate" })
                   .checkInTime.toDate(),
                 "p"
+              );
+              checkInDate = format(
+                docPart
+                  .data({ serverTimestamps: "estimate" })
+                  .checkInTime.toDate(),
+                "dd MMM yyyy"
               );
             });
           })
@@ -68,7 +74,11 @@ const MySession = () => {
               activitySess.id = actInf.id;
               activitySess.activityDatetime = dateTime;
               activitySess.checkInTime = checkInTime;
+              activitySess.checkInDate = checkInDate;
               activitySess.volunPartId = volunPartId;
+              activitySess.activityName = capitalizeWords(
+                actInf.data().activityName
+              );
 
               setMySession(activitySess);
             });
@@ -131,23 +141,32 @@ const MySession = () => {
       {hasSession ? (
         <Card>
           <View>
-            <Text>{mySession.id}</Text>
-            <Text>{capitalizeWords(mySession.activityName)}</Text>
-            <Text>{mySession.checkInTime}</Text>
-            <Text>{mySession.volunPartId}</Text>
+            <Text style={{ fontWeight: "bold" }}>{mySession.activityName}</Text>
+            <Text>Date: {mySession.activityDatetime}</Text>
+            <Text>
+              Check-in Time: {mySession.checkInDate} at {mySession.checkInTime}
+            </Text>
+            <Text>Category: {mySession.activityCategory}</Text>
             {mySession.activityCategory == "Food Bank" ? (
-              <View>
+              <View style={{ paddingTop: 5, paddingLeft: 95 }}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("BeneForm")}
                 >
-                  <Text>Beneficiary Form</Text>
+                  <Text style={styles.buttonOutlineText}>
+                    Submit Beneficiary Form
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : null}
           </View>
-          <TouchableOpacity onPress={() => registerCheckOut()}>
-            <Text>Check Out</Text>
-          </TouchableOpacity>
+
+          <View style={styles.buttonCont}>
+            <TouchableOpacity onPress={() => registerCheckOut()}>
+              <Text style={[styles.buttonOutlineText, { color: "black" }]}>
+                Check Out
+              </Text>
+            </TouchableOpacity>
+          </View>
         </Card>
       ) : (
         <Card>
@@ -160,4 +179,14 @@ const MySession = () => {
 
 export default MySession;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonOutlineText: {
+    color: "#718093",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+});

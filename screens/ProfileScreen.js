@@ -319,6 +319,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   button: {
     flex: 1,
@@ -331,13 +332,12 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   buttonOutline: {
-    backgroundColor: "white",
-
-    borderColor: "#0782F9",
+    backgroundColor: "#E9ECEF",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
     fontSize: 16,
   },

@@ -36,6 +36,7 @@ const searchActivity = async (searchText, setActivities) => {
         ...doc.data(),
         id: doc.id,
         activityDatetime: doc.data().activityDatetime.toDate(),
+        activityDatetimeEnd: doc.data().activityDatetimeEnd.toDate(),
       });
     }
   });
@@ -98,29 +99,31 @@ const SearchBar = (props) => {
     <View style={styles.section}>
       <TextInput
         style={styles.input}
-        placeholder="Search Here"
+        placeholder="Search"
         value={searchText}
         onChangeText={(text) => setSearchText(text)}
       />
-      <TouchableOpacity
-        onPress={() => {
-          if (props.type === "forums") {
-            searchForum(searchText, props.setForums);
-          } else if (props.type === "activities") {
-            searchActivity(searchText, props.setActivities);
-          } else if (props.type === "myForums") {
-            searchMyForums(
-              searchText,
-              props.setJoinedForums,
-              props.joinedForums
-            );
-          }
+      <View style={styles.buttonCont}>
+        <TouchableOpacity
+          onPress={() => {
+            if (props.type === "forums") {
+              searchForum(searchText, props.setForums);
+            } else if (props.type === "activities") {
+              searchActivity(searchText, props.setActivities);
+            } else if (props.type === "myForums") {
+              searchMyForums(
+                searchText,
+                props.setJoinedForums,
+                props.joinedForums
+              );
+            }
 
-          setSearchText("");
-        }}
-      >
-        <Text style={styles.buttonOutlineText}>Search</Text>
-      </TouchableOpacity>
+            setSearchText("");
+          }}
+        >
+          <Text style={styles.buttonOutlineText}>Search</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -135,16 +138,21 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
+    padding: 10,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 5,
     width: "85%",
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

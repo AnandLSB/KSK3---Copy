@@ -5,6 +5,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import * as RootNavigation from "../RootNavigation";
+import { MaterialIcons } from "@expo/vector-icons";
 
 import Test from "../screens/test";
 
@@ -31,7 +32,18 @@ const TabTop = createMaterialTopTabNavigator();
 
 function TabsTop() {
   return (
-    <TabTop.Navigator>
+    <TabTop.Navigator
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#e55039",
+          paddingTop: 0,
+          marginTop: 0,
+        },
+        tabBarLabelStyle: { color: "white", fontWeight: "500" },
+        tabBarIndicatorStyle: { backgroundColor: "white" },
+      }}
+      style={{ marginTop: 0 }}
+    >
       <TabTop.Screen name="My Profile" component={ProfileScreen} />
       <TabTop.Screen name="My Activities" component={MyActivitiesScreen} />
       <TabTop.Screen name="My Forums" component={CreatedForumsScreen} />
@@ -41,8 +53,25 @@ function TabsTop() {
 
 function TabsTopForum() {
   return (
-    <TabTop.Navigator>
-      <TabTop.Screen name="Joined Forums" component={JoinedForumsScreen} />
+    <TabTop.Navigator
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: "#e55039",
+          paddingTop: 0,
+          marginTop: 0,
+        },
+        tabBarLabelStyle: { color: "white", fontWeight: "500" },
+        tabBarIndicatorStyle: { backgroundColor: "white" },
+      }}
+      style={{ marginTop: 0 }}
+    >
+      <TabTop.Screen
+        name="Joined Forums"
+        component={JoinedForumsScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
       <TabTop.Screen name="Discover" component={DiscoverForumsScreen} />
     </TabTop.Navigator>
   );
@@ -50,16 +79,37 @@ function TabsTopForum() {
 
 function Tabs() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={HomeScreen} />
+    <Tab.Navigator
+      screenOptions={{
+        tabBarStyle: { backgroundColor: "#E9ECEF" },
+        tabBarActiveTintColor: "black",
+        tabBarLabelStyle: { fontWeight: "500" },
+      }}
+    >
+      <Tab.Screen
+        name="Dashboard"
+        component={HomeScreen}
+        options={{
+          headerTitleAlign: "center",
+          headerTitleStyle: { color: "white", fontSize: 18 },
+          headerStyle: { backgroundColor: "#e55039" },
+          tabBarIcon: () => (
+            <MaterialIcons name="dashboard" size={24} color="black" />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Forum"
         component={TabsTopForum}
         options={{
+          headerShown: false,
           headerTitle: "",
           headerStyle: {
             height: StatusBar.currentHeight,
           },
+          tabBarIcon: () => (
+            <MaterialIcons name="forum" size={24} color="black" />
+          ),
         }}
       />
       <Tab.Screen
@@ -67,9 +117,13 @@ function Tabs() {
         component={TabsTop}
         options={{
           headerTitle: "",
+          headerShown: false,
           headerStyle: {
             height: StatusBar.currentHeight,
           },
+          tabBarIcon: () => (
+            <MaterialIcons name="account-circle" size={24} color="black" />
+          ),
         }}
       />
     </Tab.Navigator>
@@ -87,10 +141,40 @@ const VerifiedStack = () => {
         />
         <Stack.Screen name={"EditProfile"} component={EditProfileScreen} />
         <Stack.Screen name={"EditPassword"} component={EditPasswordScreen} />
-        <Stack.Screen name={"AllActivities"} component={AllActivitiesScreen} />
+        <Stack.Screen
+          name={"AllActivities"}
+          component={AllActivitiesScreen}
+          options={{
+            headerTitle: "All Available Activities",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
         <Stack.Screen name={"ActivityDetails"} component={Test} />
-        <Stack.Screen name={"ForumDetails"} component={ForumScreen2} />
-        <Stack.Screen name={"BeneForm"} component={BeneFormScreen} />
+        <Stack.Screen
+          name={"ForumDetails"}
+          component={ForumScreen2}
+          options={{
+            headerTitle: "Forum",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name={"BeneForm"}
+          component={BeneFormScreen}
+          options={{
+            headerTitle: "Submit Beneficiary Form",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
         <Stack.Screen name={"ScanCode"} component={ScanScreen} />
         <Stack.Screen name={"PostScan"} component={PostScanScreen} />
         <Stack.Screen

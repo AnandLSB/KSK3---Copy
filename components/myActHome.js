@@ -31,7 +31,7 @@ const MyActHome = () => {
         docMy.get("myActivities").forEach((item) => {
           let docRef = doc(db, "activities", item);
           var activity = {};
-          var dateTime;
+          var dateTime, dateTimeEnd;
 
           getDoc(docRef).then((docInf) => {
             if (docInf.exists()) {
@@ -40,10 +40,12 @@ const MyActHome = () => {
                 docInf.data().activityStatus === "full"
               ) {
                 dateTime = docInf.data().activityDatetime.toDate();
+                dateTimeEnd = docInf.data().activityDatetimeEnd.toDate();
 
                 activity = docInf.data();
                 activity.id = docInf.id;
                 activity.activityDatetime = dateTime;
+                activity.activityDatetimeEnd = dateTimeEnd;
 
                 setMyActivity((myActivity) =>
                   Array.from(new Set([...myActivity, activity]))
@@ -130,15 +132,29 @@ const MyActHome = () => {
         data={myActivity}
         renderItem={({ item }) => (
           <Card>
-            <Text>{capitalizeWords(item.activityName)}</Text>
-            <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                checkSession(item.id, item.activityDatetime);
-              }}
-            >
-              <Text style={styles.buttonOutlineText}>Check In</Text>
-            </TouchableOpacity>
+            <View>
+              <Text style={{ fontWeight: "bold" }}>
+                {capitalizeWords(item.activityName)}
+              </Text>
+              <Text>
+                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetime, "p")}
+              </Text>
+              <Text>
+                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetimeEnd, "p")}
+              </Text>
+              <Text>Category: {item.activityCategory}</Text>
+            </View>
+            <View style={styles.buttonCont}>
+              <TouchableOpacity
+                onPress={() => {
+                  checkSession(item.id, item.activityDatetime);
+                }}
+              >
+                <Text style={styles.buttonOutlineText}>Check In</Text>
+              </TouchableOpacity>
+            </View>
           </Card>
         )}
       />
@@ -153,8 +169,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

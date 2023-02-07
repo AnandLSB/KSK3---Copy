@@ -58,6 +58,7 @@ const AllActivitiesScreen = () => {
           ...actDoc.data(),
           id: actDoc.id,
           activityDatetime: actDoc.data().activityDatetime.toDate(),
+          activityDatetimeEnd: actDoc.data().activityDatetimeEnd.toDate(),
         });
       });
 
@@ -119,7 +120,7 @@ const AllActivitiesScreen = () => {
   console.log(searchText);
 
   return (
-    <View>
+    <View style={styles.container}>
       <SearchBar type={"activities"} setActivities={setActivities} />
 
       {activities === null ? (
@@ -131,16 +132,30 @@ const AllActivitiesScreen = () => {
           data={activities}
           renderItem={({ item }) => (
             <Card>
-              <Text>{capitalizeWords(item.activityName)}</Text>
-              <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => {
-                  joinActivity(item.id, item);
-                }}
-              >
-                <Text style={styles.buttonOutlineText}>Join</Text>
-              </TouchableOpacity>
+              <View style={styles.infoCont}>
+                <Text style={{ fontWeight: "bold" }}>
+                  {capitalizeWords(item.activityName)}
+                </Text>
+                <Text>
+                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetime, "p")}
+                </Text>
+                <Text>
+                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetimeEnd, "p")}
+                </Text>
+                <Text>Volunteer Slots: {item.volunteerSlot}</Text>
+                <Text>Category: {item.activityCategory}</Text>
+              </View>
+              <View style={styles.buttonCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    joinActivity(item.id, item);
+                  }}
+                >
+                  <Text style={styles.buttonOutlineText}>Join</Text>
+                </TouchableOpacity>
+              </View>
             </Card>
           )}
         />
@@ -152,6 +167,10 @@ const AllActivitiesScreen = () => {
 export default AllActivitiesScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
   section: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -159,16 +178,20 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
     marginTop: 5,
     width: "85%",
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

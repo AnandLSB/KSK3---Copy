@@ -4,7 +4,7 @@ import {
   View,
   TouchableOpacity,
   Alert,
-  Button,
+  Image,
 } from "react-native";
 import React from "react";
 import {
@@ -39,10 +39,28 @@ const VerifyEmailScreen = () => {
   return (
     <View style={styles.container}>
       <View style={{ alignItems: "center", padding: 10, paddingVertical: 40 }}>
+        <Image
+          source={require("../assets/kskLogo.png")}
+          style={{ width: 120, height: 120, marginVertical: 40 }}
+        />
         <Text style={{ color: "white", textAlign: "center", fontSize: 16 }}>
           A verification email has been sent to your registered email, please
           check your email to verify your Kechara Soup Kitchen Volunteer
           Account!
+        </Text>
+        <Text
+          style={{
+            color: "white",
+            textAlign: "center",
+            fontSize: 14,
+            paddingTop: 10,
+          }}
+        >
+          If you have not received an email, please click the{" "}
+          <Text style={{ color: "black", fontWeight: "bold" }}>
+            Resend Verification Email
+          </Text>{" "}
+          button to resend the verification email
         </Text>
       </View>
       <View style={styles.buttonContainer}>
@@ -160,7 +178,7 @@ const styles = StyleSheet.create({
     width: "80%",
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 40,
-    marginBottom: 40,
+    marginTop: 10,
+    marginBottom: 100,
   },
 });

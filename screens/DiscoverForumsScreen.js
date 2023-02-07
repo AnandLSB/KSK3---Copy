@@ -152,8 +152,7 @@ const DiscoverForumsScreen = () => {
   }
 
   return (
-    <View>
-      <Text>DiscoverForumsScreen</Text>
+    <View style={styles.container}>
       <SearchBar type={"forums"} setForums={setForums} />
 
       {forums === null ? (
@@ -168,17 +167,22 @@ const DiscoverForumsScreen = () => {
               onPress={() => {
                 navigation.navigate("ForumDetails", {
                   forumId: item.id,
+                  forumTitle: item.title,
+                  createdBy: item.createdBy,
                 });
               }}
             >
               <Card>
                 <View>
-                  <Text>{capitalizeWords(item.title)}</Text>
-                  <Text>{item.desc}</Text>
-                  <Text>{item.createdBy}</Text>
-                  <Text>{JSON.stringify(item.joined)}</Text>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {capitalizeWords(item.title)}
+                  </Text>
+                  <Text>{item?.desc}</Text>
+                  <Text>Created by: {item.createdBy}</Text>
                 </View>
-                {item.joined ? null : <JoinButton forumId={item.id} />}
+                <View style={styles.buttonCont}>
+                  {item.joined ? null : <JoinButton forumId={item.id} />}
+                </View>
               </Card>
             </TouchableOpacity>
           )}
@@ -192,6 +196,10 @@ const DiscoverForumsScreen = () => {
 export default DiscoverForumsScreen;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
   section: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -199,9 +207,9 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
-    fontSize: 16,
+    fontSize: 14,
   },
   input: {
     backgroundColor: "white",
@@ -210,5 +218,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 5,
     width: "85%",
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
