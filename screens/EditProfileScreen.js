@@ -12,6 +12,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import { useNavigation, StackActions } from "@react-navigation/native";
+import { format } from "date-fns";
 
 const EditProfileScreen = ({ route }) => {
   const auth = getAuth();
@@ -58,7 +59,7 @@ const EditProfileScreen = ({ route }) => {
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Birthdate</Text>
             <View style={styles.infoCont}>
-              <Text>{user.birthdate}</Text>
+              <Text>{format(route.params.birthdate, "dd MMM yyyy")}</Text>
             </View>
           </View>
           <View style={{ padding: 5 }}>

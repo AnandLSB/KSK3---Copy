@@ -15,11 +15,19 @@ import {
   sendEmailVerification,
 } from "firebase/auth";
 import { db } from "../config/firebase";
-import { collection, addDoc, setDoc, doc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  setDoc,
+  doc,
+  Timestamp,
+  serverTimestamp,
+} from "firebase/firestore";
 import { StackActions } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { format } from "date-fns";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const RegisterExtScreen = ({ route }) => {
   const auth = getAuth();
@@ -35,9 +43,15 @@ const RegisterExtScreen = ({ route }) => {
   const [homeAddress, setHomeAddress] = useState("");
   const [emergencyContact, setEmergencyContact] = useState("");
   const [kskLocation, setKskLocation] = useState("");
-  const accountCreationDate = Date().toString();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState("Birthdate");
+
+  const [selected, setSelected] = React.useState("");
+
+  const nationalityData = [
+    { key: "1", value: "Malaysian" },
+    { key: "2", value: "Non-Malaysian" },
+  ];
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -52,6 +66,7 @@ const RegisterExtScreen = ({ route }) => {
       "A date has been picked: ",
       new Date(date.setHours(0, 0, 0, 0))
     );
+    setBirthdate(new Date(date.setHours(0, 0, 0, 0)));
     setDate(format(new Date(date.setHours(0, 0, 0, 0)), "dd MMM yyyy"));
     hideDatePicker();
   };
@@ -116,11 +131,11 @@ const RegisterExtScreen = ({ route }) => {
       icNumber: icNumber,
       phoneNumber: phoneNumber,
       nationality: nationality,
-      birthdate: birthdate,
+      birthdate: Timestamp.fromDate(birthdate),
       homeAddress: homeAddress,
       emergencyContact: emergencyContact,
       kskLocation: kskLocation,
-      accountCreationDate: accountCreationDate,
+      accountCreationDate: serverTimestamp(),
       profilePic:
         "https://firebasestorage.googleapis.com/v0/b/kskfyp.appspot.com/o/default%2Fuser.png?alt=media&token=394cb43f-30b0-4e40-81fa-0b220d6e121c",
       myActivities: [],
@@ -138,6 +153,8 @@ const RegisterExtScreen = ({ route }) => {
       alert(error.message);
     });
   };
+
+  console.log("Birth", birthdate);
 
   return (
     <View style={styles.container}>
@@ -172,23 +189,31 @@ const RegisterExtScreen = ({ route }) => {
             onChangeText={(text) => setFullName(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="IC Number"
             value={icNumber}
             onChangeText={(text) => setIcNumber(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="Mobile Number"
             value={phoneNumber}
             onChangeText={(text) => setPhoneNumber(text)}
             style={styles.input}
           />
-          <TextInput
-            placeholder="Nationality"
-            value={nationality}
-            onChangeText={(text) => setNationality(text)}
-            style={styles.input}
+
+          <SelectList
+            placeholder={<Text style={{ color: "#808080" }}>Nationality</Text>}
+            setSelected={(val) => {
+              setNationality(val);
+            }}
+            search={false}
+            data={nationalityData}
+            save="value"
+            boxStyles={{ backgroundColor: "white", marginTop: 5 }}
+            dropdownStyles={{ backgroundColor: "white" }}
           />
 
           <View style={[styles.section, styles.input, { paddingVertical: 15 }]}>
@@ -204,19 +229,25 @@ const RegisterExtScreen = ({ route }) => {
             onChangeText={(text) => setHomeAddress(text)}
             style={styles.input}
           />
+
           <TextInput
             placeholder="Emergency Contact"
             value={emergencyContact}
             onChangeText={(text) => setEmergencyContact(text)}
             style={styles.input}
           />
-          <TextInput
-            placeholder="KSK Location"
-            value={kskLocation}
-            onChangeText={(text) => setKskLocation(text)}
-            style={styles.input}
+
+          <SelectList
+            placeholder={<Text style={{ color: "#808080" }}>KSK Location</Text>}
+            setSelected={(val) => {
+              setKskLocation(val);
+            }}
+            search={false}
+            data={[{ key: "1", value: "Selangor" }]}
+            save="value"
+            boxStyles={{ backgroundColor: "white", marginTop: 5 }}
+            dropdownStyles={{ backgroundColor: "white" }}
           />
-          <TextInput placeholder={accountCreationDate} style={styles.input} />
         </ScrollView>
       </View>
       <View style={styles.buttonContainer}>

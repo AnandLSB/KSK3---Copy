@@ -17,7 +17,11 @@ const UnverifiedStack = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+        <Stack.Screen
+          name="VerifyEmail"
+          component={VerifyEmailScreen}
+          options={{ headerShown: false }}
+        />
         <Stack.Screen
           name="Verified"
           component={Verified}

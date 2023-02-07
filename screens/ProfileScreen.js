@@ -31,11 +31,12 @@ import { ref, uploadBytes, getStorage, getDownloadURL } from "firebase/storage";
 import { uuidv4 } from "@firebase/util";
 import Dialog from "react-native-dialog";
 import messaging from "@react-native-firebase/messaging";
+import { format } from "date-fns";
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
   const auth = getAuth();
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
   const [uploading, setUploading] = useState(false);
   const [initializing, setInitializing] = useState(true);
   const docRef = doc(db, "volunteer", auth.currentUser?.uid);
@@ -48,7 +49,10 @@ const ProfileScreen = () => {
 
   async function getUser() {
     onSnapshot(docRef, (doc) => {
-      setUser(doc.data());
+      setUser({
+        ...doc.data(),
+        birthdate: doc.data().birthdate.toDate(),
+      });
       if (initializing) setInitializing(false);
     });
   }
@@ -207,6 +211,7 @@ const ProfileScreen = () => {
           onPress={() =>
             navigation.navigate("EditProfile", {
               user: user,
+              birthdate: user?.birthdate,
             })
           }
         >
@@ -225,7 +230,7 @@ const ProfileScreen = () => {
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Birthdate</Text>
             <View style={styles.infoCont}>
-              <Text>{user?.birthdate}</Text>
+              <Text>{format(user?.birthdate, "dd MMM yyyy")}</Text>
             </View>
           </View>
           <View style={{ padding: 5 }}>

@@ -32,7 +32,11 @@ export default function AuthStack() {
           component={RegisterExtScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
+        <Stack.Screen
+          name="VerifyEmail"
+          component={VerifyEmailScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
