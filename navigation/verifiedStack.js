@@ -139,8 +139,28 @@ const VerifiedStack = () => {
           component={Tabs}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name={"EditProfile"} component={EditProfileScreen} />
-        <Stack.Screen name={"EditPassword"} component={EditPasswordScreen} />
+        <Stack.Screen
+          name={"EditProfile"}
+          component={EditProfileScreen}
+          options={{
+            headerTitle: "Edit Profile Information",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name={"EditPassword"}
+          component={EditPasswordScreen}
+          options={{
+            headerTitle: "Edit Account Email/Password",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
         <Stack.Screen
           name={"AllActivities"}
           component={AllActivitiesScreen}
@@ -180,6 +200,13 @@ const VerifiedStack = () => {
         <Stack.Screen
           name={"CompletedActivities"}
           component={CompletedActivitiesScreen}
+          options={{
+            headerTitle: "Completed Activities",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>

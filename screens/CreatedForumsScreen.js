@@ -22,6 +22,7 @@ import Card from "../components/card";
 import { useRoute } from "@react-navigation/native";
 import Dialog from "react-native-dialog";
 import { editForum, deleteForum } from "../components/forumFunc";
+import { capitalizeWords } from "../components/activityFunc";
 
 const CreatedForumsScreen = () => {
   const auth = getAuth();
@@ -40,14 +41,21 @@ const CreatedForumsScreen = () => {
   useEffect(() => {
     const unsubscribe = onSnapshot(qMyForum, (querySnapshot) => {
       setMyForums([]);
-      var forum = {};
+      var forum = {},
+        username;
 
       querySnapshot.forEach((docFor) => {
         let userRef = doc(db, "volunteer", docFor.data().createdBy);
 
         getDoc(userRef).then((userInfo) => {
+          if (docFor.data().createdBy === auth.currentUser.uid) {
+            username = "You";
+          } else {
+            username = userInfo.data().Username;
+          }
+
           forum = docFor.data();
-          forum.createdBy = userInfo.data().Username;
+          forum.createdBy = username;
           forum.createdAt = docFor
             .data({ serverTimestamps: "estimate" })
             .createdAt.toDate();
@@ -62,7 +70,7 @@ const CreatedForumsScreen = () => {
   }, []);
 
   return (
-    <View>
+    <View style={styles.container}>
       <View>
         <Dialog.Container visible={modalVisible}>
           <Dialog.Title>Edit Forum Information</Dialog.Title>
@@ -92,13 +100,18 @@ const CreatedForumsScreen = () => {
         </Dialog.Container>
       </View>
 
-      <Text>CreatedForumsScreen</Text>
+      <View style={[styles.section, { justifyContent: "space-between" }]}>
+        <Text style={[styles.buttonOutlineTextSection, { color: "black" }]}>
+          Your Created Forums:
+        </Text>
+      </View>
+
       <FlatList
         data={myforums}
         renderItem={({ item }) => (
           <Card>
             <View>
-              <Text>Title: {item.title}</Text>
+              <Text>Title: {capitalizeWords(item.title)}</Text>
               <Text>Desc: {item.desc}</Text>
               <Text>Created By: {item.createdBy}</Text>
             </View>
@@ -144,4 +157,20 @@ const CreatedForumsScreen = () => {
 
 export default CreatedForumsScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: "100%",
+    padding: 5,
+  },
+  buttonOutlineTextSection: {
+    color: "#EB4335",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+});

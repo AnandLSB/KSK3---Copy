@@ -10,6 +10,7 @@ import { capitalizeWords } from "../components/activityFunc";
 const CompletedActivitiesScreen = () => {
   const auth = getAuth();
   const [completedActivities, setCompletedActivities] = React.useState([]);
+  const [hasActivity, setHasActivity] = React.useState(false);
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
 
   useEffect(() => {
@@ -21,17 +22,20 @@ const CompletedActivitiesScreen = () => {
     const docSnap = await getDoc(userRef);
 
     if (docSnap.data().myCompleteAct.length > 0) {
+      setHasActivity(true);
       docSnap.get("myCompleteAct").forEach((item) => {
         let actRef = doc(db, "activities", item);
         var activity = {};
-        var dateTime;
+        var dateTime, dateTimeEnd;
 
         getDoc(actRef).then((docInf) => {
           if (docInf.exists()) {
             dateTime = docInf.data().activityDatetime.toDate();
+            dateTimeEnd = docInf.data().activityDatetimeEnd.toDate();
 
             activity = docInf.data();
             activity.activityDatetime = dateTime;
+            activity.activityDatetimeEnd = dateTimeEnd;
             activity.activityId = docInf.id;
 
             setCompletedActivities((completedActivities) =>
@@ -41,26 +45,55 @@ const CompletedActivitiesScreen = () => {
         });
       });
     } else {
-      //TODO: Display message to user that they have no completed activities
+      setHasActivity(false);
     }
   };
 
   return (
-    <View>
-      <Text>CompletedActivitiesScreen</Text>
-      <FlatList
-        data={completedActivities}
-        renderItem={({ item }) => (
-          <Card>
-            <Text>{capitalizeWords(item.activityName)}</Text>
-            <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
-          </Card>
-        )}
-      />
+    <View style={styles.container}>
+      <View style={{ padding: 5 }}>
+        <Text style={{ textAlign: "center", fontWeight: "500", fontSize: 15 }}>
+          A summary of the volunteer activities you have completed with the
+          Kechara Soup Kitchen!
+        </Text>
+      </View>
+
+      {hasActivity ? (
+        <FlatList
+          data={completedActivities}
+          renderItem={({ item }) => (
+            <Card>
+              <View>
+                <Text style={{ fontWeight: "bold" }}>
+                  {capitalizeWords(item.activityName)}
+                </Text>
+                <Text>
+                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetime, "p")}
+                </Text>
+                <Text>
+                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetimeEnd, "p")}
+                </Text>
+                <Text>Category: {item.activityCategory}</Text>
+              </View>
+            </Card>
+          )}
+        />
+      ) : (
+        <Card>
+          <Text>You have not completed any activities yet!</Text>
+        </Card>
+      )}
     </View>
   );
 };
 
 export default CompletedActivitiesScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+});

@@ -170,8 +170,11 @@ const ForumScreen2 = ({ route }) => {
         <View style={styles.section}>
           <View>
             <View style={{ paddingVertical: 5 }}>
-              <Text style={{ fontWeight: "500" }}>
-                {item.username} at {format(item.createdAt, "PPp")}
+              <Text style={{ fontWeight: "500", fontSize: 14 }}>
+                {item.username}{" "}
+                <Text style={{ fontWeight: "400", fontSize: 12 }}>
+                  {format(item.createdAt, "PPp")}
+                </Text>
               </Text>
             </View>
 

@@ -53,7 +53,7 @@ const MyActivitiesScreen = () => {
         docMy.get("myActivities").forEach((item) => {
           let docRef = doc(db, "activities", item);
           var activity = {};
-          var dateTime;
+          var dateTime, dateTimeEnd;
 
           getDoc(docRef).then((docInf) => {
             if (docInf.exists()) {
@@ -62,10 +62,12 @@ const MyActivitiesScreen = () => {
                 docInf.data().activityStatus === "full"
               ) {
                 dateTime = docInf.data().activityDatetime.toDate();
+                dateTimeEnd = docInf.data().activityDatetimeEnd.toDate();
 
                 activity = docInf.data();
                 activity.Id = docInf.id;
                 activity.activityDatetime = dateTime;
+                activity.activityDatetimeEnd = dateTimeEnd;
 
                 setActivityInfo((activityInfo) =>
                   Array.from(new Set([...activityInfo, activity]))
@@ -142,29 +144,48 @@ const MyActivitiesScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>MyActivitiesScreen</Text>
-      <TouchableOpacity
-        onPress={() => {
-          navigation.navigate("CompletedActivities");
-        }}
-      >
-        <Text>My Completed Activities</Text>
-      </TouchableOpacity>
+      <View style={[styles.section, { justifyContent: "space-between" }]}>
+        <Text style={[styles.buttonOutlineTextSection, { color: "black" }]}>
+          Your Upcoming Activities:
+        </Text>
+        <TouchableOpacity
+          onPress={() => {
+            navigation.navigate("CompletedActivities");
+          }}
+        >
+          <Text style={styles.buttonOutlineTextSection}>
+            Completed Activities
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={activityInfo}
         renderItem={({ item }) => (
           <Card>
-            <Text>{capitalizeWords(item.activityName)}</Text>
-            <Text>{format(item.activityDatetime, "dd MMM yyyy")}</Text>
-            <TouchableOpacity
-              onPress={() => {
-                leaveActivity(item.Id);
-                //setActivityInfo([]);
-              }}
-            >
-              <Text style={styles.buttonOutlineText}>Cancel</Text>
-            </TouchableOpacity>
+            <View>
+              <Text>{capitalizeWords(item.activityName)}</Text>
+              <Text>
+                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetime, "p")}
+              </Text>
+              <Text>
+                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                {format(item.activityDatetimeEnd, "p")}
+              </Text>
+              <Text>Category: {item.activityCategory}</Text>
+            </View>
+
+            <View style={styles.buttonCont}>
+              <TouchableOpacity
+                onPress={() => {
+                  leaveActivity(item.Id);
+                  //setActivityInfo([]);
+                }}
+              >
+                <Text style={styles.buttonOutlineText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </Card>
         )}
       />
@@ -177,5 +198,26 @@ export default MyActivitiesScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    width: "100%",
+    padding: 5,
+  },
+  buttonOutlineTextSection: {
+    color: "#EB4335",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  buttonOutlineText: {
+    color: "black",
+    fontWeight: "700",
+    fontSize: 14,
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

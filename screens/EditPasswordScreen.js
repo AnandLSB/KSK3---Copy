@@ -61,15 +61,21 @@ const EditPasswordScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text>Edit Email</Text>
+      <View style={{ margin: 10, marginBottom: 40 }}>
+        <Text style={{ fontWeight: "500", fontSize: 16, textAlign: "center" }}>
+          Edit your account password or email in the fields below!
+        </Text>
+      </View>
+
       <View style={styles.inputContainer}>
+        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Email</Text>
         <TextInput
           placeholder={email}
           value={email}
           onChangeText={(text) => setEmail(text)}
           style={styles.input}
         />
-        <Text>Edit Password</Text>
+        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Password</Text>
         <TextInput
           placeholder="Current Password"
           value={currPassword}
@@ -106,6 +112,8 @@ const EditPasswordScreen = () => {
               Alert.alert("Error!", "Please fill in email field");
             } else if (!validator.validate(email)) {
               Alert.alert("Error!", "Please enter a valid email");
+            } else if (email === auth.currentUser?.email) {
+              Alert.alert("Error!", "Please enter a new email");
             } else {
               handleUpdateEmail();
             }
@@ -143,9 +151,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "white",
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
@@ -157,17 +166,18 @@ const styles = StyleSheet.create({
   buttonContainer: {
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: 5,
+    marginTop: 10,
     width: "90%",
+    marginBottom: 90,
   },
   buttonOutline: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -177,5 +187,11 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
+  },
+  section: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    width: "100%",
+    padding: 5,
   },
 });

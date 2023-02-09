@@ -211,7 +211,7 @@ const ProfileScreen = () => {
           onPress={() =>
             navigation.navigate("EditProfile", {
               user: user,
-              birthdate: user?.birthdate,
+              birthdate: format(user.birthdate, "dd MMM yyyy"),
             })
           }
         >
@@ -370,8 +370,7 @@ const styles = StyleSheet.create({
   },
   infoCont: {
     borderColor: "black",
-    borderWidth: 1,
-    borderRadius: 5,
+    borderBottomWidth: 1,
     padding: 3,
   },
   userImg: {

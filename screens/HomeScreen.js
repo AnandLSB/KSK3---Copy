@@ -102,6 +102,11 @@ const HomeScreen = () => {
       <MySession />
 
       <View style={styles.section}>
+        <Text style={{ fontWeight: "bold" }}>My Upcoming Activities</Text>
+      </View>
+      <MyActHome />
+
+      <View style={styles.section}>
         <Text style={{ fontWeight: "bold" }}>Available Activities</Text>
         <TouchableOpacity
           onPress={() => {
@@ -114,7 +119,7 @@ const HomeScreen = () => {
 
       <FlatList
         data={allActivity}
-        style={{ flexGrow: 0, height: "35%" }}
+        style={{ flexGrow: 0, height: "45%" }}
         renderItem={({ item }) => (
           <Card>
             <View style={styles.infoCont}>
@@ -144,11 +149,6 @@ const HomeScreen = () => {
           </Card>
         )}
       />
-
-      <View style={styles.section}>
-        <Text style={{ fontWeight: "bold" }}>My Upcoming Activities</Text>
-      </View>
-      <MyActHome />
     </View>
   );
 };

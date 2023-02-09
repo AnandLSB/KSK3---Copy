@@ -59,7 +59,7 @@ const EditProfileScreen = ({ route }) => {
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Birthdate</Text>
             <View style={styles.infoCont}>
-              <Text>{format(route.params.birthdate, "dd MMM yyyy")}</Text>
+              <Text>{route.params.birthdate}</Text>
             </View>
           </View>
           <View style={{ padding: 5 }}>
@@ -136,6 +136,7 @@ export default EditProfileScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
   buttonContainer: {
     justifyContent: "center",
@@ -143,13 +144,13 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   buttonOutline: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     marginTop: 5,
-    borderColor: "#0782F9",
+    borderColor: "black",
     borderWidth: 2,
   },
   buttonOutlineText: {
-    color: "#0782F9",
+    color: "black",
     fontWeight: "700",
     fontSize: 16,
   },
@@ -166,7 +167,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#E9ECEF",
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 10,
