@@ -195,8 +195,26 @@ const VerifiedStack = () => {
             headerTintColor: "white",
           }}
         />
-        <Stack.Screen name={"ScanCode"} component={ScanScreen} />
-        <Stack.Screen name={"PostScan"} component={PostScanScreen} />
+        <Stack.Screen
+          name={"ScanCode"}
+          component={ScanScreen}
+          options={{
+            headerTitle: "Scan QR Code",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name={"PostScan"}
+          component={PostScanScreen}
+          options={{
+            headerLeft: null,
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#e55039" },
+          }}
+        />
         <Stack.Screen
           name={"CompletedActivities"}
           component={CompletedActivitiesScreen}

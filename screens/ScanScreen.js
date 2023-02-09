@@ -34,13 +34,6 @@ const ScanScreen = ({ route }) => {
     getBarCodeScannerPermissions();
   }, []);
 
-  /*
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-  };
-  */
-
   const handleBarCodeScanned = ({ type, data }) => {
     setScanned(true);
     console.log(data);
@@ -103,15 +96,25 @@ const ScanScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Text>ScanScreen</Text>
+      <View style={{ paddingBottom: 40 }}>
+        <Text
+          style={{
+            color: "white",
+            fontWeight: "500",
+            textAlign: "center",
+            fontSize: 16,
+          }}
+        >
+          Scan the QR code for the respective Kechara Soup Kitchen Volunteer
+          Activity!
+        </Text>
+      </View>
+
       <BarCodeScanner
         barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-        style={StyleSheet.absoluteFillObject}
+        style={{ height: "60%", width: "100%" }}
       />
-      {scanned && (
-        <Button title={"Tap to Scan Again"} onPress={() => setScanned(false)} />
-      )}
     </View>
   );
 };
@@ -122,5 +125,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center",
+    backgroundColor: "black",
   },
 });
