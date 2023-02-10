@@ -135,7 +135,9 @@ const ForumScreen2 = ({ route }) => {
             navigation.dispatch(StackActions.pop(1));
           }}
         >
-          <Text style={styles.buttonOutlineText}>Leave</Text>
+          <Text style={[styles.buttonOutlineText, { color: "#e55039" }]}>
+            Leave
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -150,7 +152,7 @@ const ForumScreen2 = ({ route }) => {
             setEditModalVisible(true);
           }}
         >
-          <Text>Edit</Text>
+          <Text style={{ paddingBottom: 3 }}>Edit</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -158,7 +160,7 @@ const ForumScreen2 = ({ route }) => {
             deleteForumPost(props.forumId);
           }}
         >
-          <Text style={{ color: "#e55039" }}>Delete</Text>
+          <Text style={{ color: "#e55039", paddingTop: 3 }}>Delete</Text>
         </TouchableOpacity>
       </View>
     );

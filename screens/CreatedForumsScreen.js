@@ -19,7 +19,7 @@ import {
 import { db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import Card from "../components/card";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useNavigation } from "@react-navigation/native";
 import Dialog from "react-native-dialog";
 import { editForum, deleteForum } from "../components/forumFunc";
 import { capitalizeWords } from "../components/activityFunc";
@@ -27,6 +27,7 @@ import { capitalizeWords } from "../components/activityFunc";
 const CreatedForumsScreen = () => {
   const auth = getAuth();
   const route = useRoute();
+  const navigation = useNavigation();
   const forumsRef = collection(db, "forums");
   const [myforums, setMyForums] = React.useState([]);
   const [newTitle, setNewTitle] = React.useState("");
@@ -109,46 +110,58 @@ const CreatedForumsScreen = () => {
       <FlatList
         data={myforums}
         renderItem={({ item }) => (
-          <Card>
-            <View>
-              <Text>Title: {capitalizeWords(item.title)}</Text>
-              <Text>Desc: {item.desc}</Text>
-              <Text>Created By: {item.createdBy}</Text>
-            </View>
-            <View>
-              <TouchableOpacity
-                onPress={() => {
-                  setForumId(item.id);
-                  setNewTitle(item.title);
-                  setNewDesc(item.desc);
-                  setModalVisible(true);
-                }}
-              >
-                <Text>Edit</Text>
-              </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("ForumDetails", {
+                forumId: item.id,
+                forumTitle: item.title,
+                createdBy: item.createdBy,
+              });
+            }}
+          >
+            <Card>
+              <View>
+                <Text>Title: {capitalizeWords(item.title)}</Text>
+                <Text>Desc: {item.desc}</Text>
+                <Text>Created By: {item.createdBy}</Text>
+              </View>
+              <View style={styles.buttonCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setForumId(item.id);
+                    setNewTitle(item.title);
+                    setNewDesc(item.desc);
+                    setModalVisible(true);
+                  }}
+                >
+                  <Text style={{ paddingBottom: 3 }}>Edit</Text>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                onPress={() => {
-                  Alert.alert(
-                    "Delete Forum",
-                    "Are you sure you want to delete this forum?",
-                    [
-                      {
-                        text: "Cancel",
-                      },
-                      {
-                        text: "OK",
-                        onPress: () => deleteForum(item.id),
-                      },
-                    ],
-                    { cancelable: true }
-                  );
-                }}
-              >
-                <Text>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </Card>
+                <TouchableOpacity
+                  onPress={() => {
+                    Alert.alert(
+                      "Delete Forum",
+                      "Are you sure you want to delete this forum?",
+                      [
+                        {
+                          text: "Cancel",
+                        },
+                        {
+                          text: "OK",
+                          onPress: () => deleteForum(item.id),
+                        },
+                      ],
+                      { cancelable: true }
+                    );
+                  }}
+                >
+                  <Text style={{ color: "#e55039", paddingTop: 3 }}>
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -172,5 +185,9 @@ const styles = StyleSheet.create({
     color: "#EB4335",
     fontWeight: "700",
     fontSize: 14,
+  },
+  buttonCont: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
