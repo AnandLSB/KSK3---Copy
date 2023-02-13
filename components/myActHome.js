@@ -27,7 +27,7 @@ const MyActHome = () => {
       setMyActivity([]);
       //If the user has joined any activities
       if (docMy.data().myActivities.length > 0) {
-        //console.log(docMy.data().myActivities);
+        console.log("My Activities ", docMy.data().myActivities);
         docMy.get("myActivities").forEach((item) => {
           let docRef = doc(db, "activities", item);
           var activity = {};
@@ -55,11 +55,10 @@ const MyActHome = () => {
           });
         });
 
-        if (myActivity.length > 0) {
-          setHasActivity(true);
-        } else {
-          setHasActivity(false);
-        }
+        setHasActivity(true);
+      } else if (myActivity.length === 0) {
+        //If the activity array is empty
+        setHasActivity(false);
       } else {
         //If the user has not joined any activities
         setHasActivity(false);
