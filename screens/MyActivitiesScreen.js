@@ -89,6 +89,13 @@ const MyActivitiesScreen = () => {
 
     if (initializing) setInitializing(false);
 
+    return () => unsubscribe();
+  }, []);
+
+  //console.log(myActivity);
+  //console.log(activityInfo);
+
+  if (isFocused) {
     if (inactiveAct.length > 0) {
       Alert.alert(
         "Inactive Activities Found",
@@ -111,24 +118,13 @@ const MyActivitiesScreen = () => {
         ]
       );
     }
-
-    return () => unsubscribe();
-  }, []);
-
-  //console.log(myActivity);
-  //console.log(activityInfo);
+  }
 
   if (initializing) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" />
       </View>
-    );
-  } else if (hasActivity === false) {
-    return (
-      <Card>
-        <Text>No activities joined yet</Text>
-      </Card>
     );
   }
 
@@ -159,36 +155,42 @@ const MyActivitiesScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <FlatList
-        data={activityInfo}
-        renderItem={({ item }) => (
-          <Card>
-            <View>
-              <Text>{capitalizeWords(item.activityName)}</Text>
-              <Text>
-                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetime, "p")}
-              </Text>
-              <Text>
-                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetimeEnd, "p")}
-              </Text>
-              <Text>Category: {item.activityCategory}</Text>
-            </View>
+      {hasActivity ? (
+        <FlatList
+          data={activityInfo}
+          renderItem={({ item }) => (
+            <Card>
+              <View>
+                <Text>{capitalizeWords(item.activityName)}</Text>
+                <Text>
+                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetime, "p")}
+                </Text>
+                <Text>
+                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetimeEnd, "p")}
+                </Text>
+                <Text>Category: {item.activityCategory}</Text>
+              </View>
 
-            <View style={styles.buttonCont}>
-              <TouchableOpacity
-                onPress={() => {
-                  leaveActivity(item.Id);
-                  //setActivityInfo([]);
-                }}
-              >
-                <Text style={styles.buttonOutlineText}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </Card>
-        )}
-      />
+              <View style={styles.buttonCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    leaveActivity(item.Id);
+                    //setActivityInfo([]);
+                  }}
+                >
+                  <Text style={styles.buttonOutlineText}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
+        />
+      ) : (
+        <Card>
+          <Text>No activities joined yet</Text>
+        </Card>
+      )}
     </View>
   );
 };

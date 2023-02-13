@@ -78,7 +78,13 @@ function App() {
     });
 
     const unsubscribeFore = messaging().onMessage(async (remoteMessage) => {
-      Alert.alert("A new FCM message arrived!", JSON.stringify(remoteMessage));
+      if (remoteMessage.data.createdBy !== auth.currentUser.uid) {
+        Alert.alert(
+          "A new FCM message arrived!",
+          JSON.stringify(remoteMessage)
+        );
+      }
+      console.log("New Forum Post");
     });
 
     return unsubscribeAuth, unsubscribeFore;

@@ -27,7 +27,7 @@ const MyActHome = () => {
       setMyActivity([]);
       //If the user has joined any activities
       if (docMy.data().myActivities.length > 0) {
-        console.log(docMy.data().myActivities);
+        //console.log(docMy.data().myActivities);
         docMy.get("myActivities").forEach((item) => {
           let docRef = doc(db, "activities", item);
           var activity = {};
@@ -55,7 +55,11 @@ const MyActHome = () => {
           });
         });
 
-        setHasActivity(true);
+        if (myActivity.length > 0) {
+          setHasActivity(true);
+        } else {
+          setHasActivity(false);
+        }
       } else {
         //If the user has not joined any activities
         setHasActivity(false);
@@ -64,6 +68,8 @@ const MyActHome = () => {
 
     return () => unsubscribe();
   }, []);
+
+  console.log(myActivity);
 
   /* In case you need it later; this is the code for checking if the activity is still ongoing or passed
   if (
@@ -121,7 +127,7 @@ const MyActHome = () => {
   if (hasActivity === false) {
     return (
       <Card>
-        <Text>No activities joined yet</Text>
+        <Text>No upcoming activities</Text>
       </Card>
     );
   }
