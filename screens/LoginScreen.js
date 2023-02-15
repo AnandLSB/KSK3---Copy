@@ -32,7 +32,20 @@ const LoginScreen = () => {
       if (userDoc.data().myForums.length > 0) {
         userDoc.get("myForums").forEach((forumItem) => {
           messaging().subscribeToTopic(forumItem);
-          console.log("Subscribed to " + forumItem);
+          console.log("Subscribed to forum " + forumItem);
+        });
+      }
+    });
+  };
+
+  const subscribeActivities = (userID) => {
+    const userRef = doc(db, "volunteer", userID);
+
+    getDoc(userRef).then((userDoc) => {
+      if (userDoc.data().myActivities.length > 0) {
+        userDoc.get("myActivities").forEach((activityItem) => {
+          messaging().subscribeToTopic(activityItem);
+          console.log("Subscribed to activity " + activityItem);
         });
       }
     });
@@ -42,6 +55,7 @@ const LoginScreen = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
         subscribeForums(auth.currentUser.uid);
+        subscribeActivities(auth.currentUser.uid);
       })
       .catch((error) => {
         if (error.code === "auth/user-not-found") {

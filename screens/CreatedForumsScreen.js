@@ -34,40 +34,43 @@ const CreatedForumsScreen = () => {
   const [newDesc, setNewDesc] = React.useState("");
   const [modalVisible, setModalVisible] = React.useState(false);
   const [forumId, setForumId] = React.useState("");
-  const qMyForum = query(
-    forumsRef,
-    where("createdBy", "==", auth.currentUser.uid)
-  );
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(qMyForum, (querySnapshot) => {
-      setMyForums([]);
-      var forum = {},
-        username;
+    if (auth.currentUser !== null) {
+      const qMyForum = query(
+        forumsRef,
+        where("createdBy", "==", auth.currentUser.uid)
+      );
 
-      querySnapshot.forEach((docFor) => {
-        let userRef = doc(db, "volunteer", docFor.data().createdBy);
+      const unsubscribe = onSnapshot(qMyForum, (querySnapshot) => {
+        setMyForums([]);
+        var forum = {},
+          username;
 
-        getDoc(userRef).then((userInfo) => {
-          if (docFor.data().createdBy === auth.currentUser.uid) {
-            username = "You";
-          } else {
-            username = userInfo.data().Username;
-          }
+        querySnapshot.forEach((docFor) => {
+          let userRef = doc(db, "volunteer", docFor.data().createdBy);
 
-          forum = docFor.data();
-          forum.createdBy = username;
-          forum.createdAt = docFor
-            .data({ serverTimestamps: "estimate" })
-            .createdAt.toDate();
-          forum.id = docFor.id;
+          getDoc(userRef).then((userInfo) => {
+            if (docFor.data().createdBy === auth.currentUser.uid) {
+              username = "You";
+            } else {
+              username = userInfo.data().Username;
+            }
 
-          setMyForums((myforums) => [...myforums, forum]);
+            forum = docFor.data();
+            forum.createdBy = username;
+            forum.createdAt = docFor
+              .data({ serverTimestamps: "estimate" })
+              .createdAt.toDate();
+            forum.id = docFor.id;
+
+            setMyForums((myforums) => [...myforums, forum]);
+          });
         });
       });
-    });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    }
   }, []);
 
   return (

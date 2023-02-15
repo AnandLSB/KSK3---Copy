@@ -67,9 +67,12 @@ function App() {
         "Notification caused app to open from background state:",
         remoteMessage.notification
       );
-      RootNavigation.navigate("ForumDetails", {
-        forumId: remoteMessage.data.forumId,
-      });
+
+      if (remoteMessage.data.forumId !== undefined) {
+        RootNavigation.navigate("ForumDetails", {
+          forumId: remoteMessage.data.forumId,
+        });
+      }
     });
 
     // Register background handler
@@ -78,7 +81,7 @@ function App() {
     });
 
     const unsubscribeFore = messaging().onMessage(async (remoteMessage) => {
-      if (remoteMessage.data.createdBy !== auth.currentUser.uid) {
+      if (remoteMessage.data.createdBy !== auth.currentUser?.uid) {
         Alert.alert(
           "A new FCM message arrived!",
           JSON.stringify(remoteMessage)

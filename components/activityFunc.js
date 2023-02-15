@@ -17,6 +17,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
+import messaging from "@react-native-firebase/messaging";
 
 const auth = getAuth();
 
@@ -98,6 +99,14 @@ async function leaveActivity(activityId) {
       console.error("Error updating document: ", error);
     })
     .then(() => {
+      messaging()
+        .unsubscribeFromTopic(activityId)
+        .then(() =>
+          console.log("Unsubscribed from activity topic: ", activityId)
+        )
+        .catch((error) =>
+          console.log("Error unsubscribing from topic: ", error)
+        );
       Alert.alert("You have successfully left the activity!");
     });
 }
@@ -125,6 +134,15 @@ const updateActivity = async (userRef, activityId) => {
       console.error("Error updating document: ", error);
     })
     .then(() => {
+      messaging()
+        .subscribeToTopic(activityId)
+        .then(() => {
+          console.log("Subscribed to activity topic: ", activityId);
+        })
+        .catch((error) => {
+          console.log("Error subscribing to topic: ", error);
+        });
+
       Alert.alert("You have successfully joined the activity!");
     });
 };

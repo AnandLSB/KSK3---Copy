@@ -9,7 +9,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useCallback, useEffect, useLayoutEffect } from "react";
-import { collection, query, onSnapshot, where, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
 import {
@@ -30,6 +37,7 @@ const ForumScreen2 = ({ route }) => {
   const auth = getAuth();
   const navigation = useNavigation();
   const [loading, setLoading] = React.useState(true);
+  const [forumTitle, setForumTitle] = React.useState("");
 
   //Member State
   const [isMember, setIsMember] = React.useState(false);
@@ -51,6 +59,7 @@ const ForumScreen2 = ({ route }) => {
   useLayoutEffect(() => {
     const collectionRef = collection(db, "forumPost");
     const q = query(collectionRef, where("forumId", "==", forumId));
+    getForumTitle();
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setForumPosts(
@@ -98,6 +107,17 @@ const ForumScreen2 = ({ route }) => {
   forumPosts.sort((a, b) => {
     return b.createdAt - a.createdAt;
   });
+
+  const getForumTitle = async () => {
+    const forumRef = doc(db, "forums", forumId);
+    getDoc(forumRef).then((doc) => {
+      if (doc.exists()) {
+        setForumTitle(doc.data().title);
+      } else {
+        console.log("No such document!");
+      }
+    });
+  };
 
   const checkMember = () => {
     const userRef = doc(db, "volunteer", auth.currentUser.uid);
@@ -239,9 +259,7 @@ const ForumScreen2 = ({ route }) => {
         ]}
       >
         <View style={{ padding: 5 }}>
-          <Text style={{ fontWeight: "500", fontSize: 15 }}>
-            {route.params.forumTitle}
-          </Text>
+          <Text style={{ fontWeight: "500", fontSize: 15 }}>{forumTitle}</Text>
           <Text style={{ fontWeight: "400" }}>
             Created by: {route.params.createdBy}
           </Text>

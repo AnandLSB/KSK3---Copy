@@ -44,7 +44,7 @@ const HomeScreen = () => {
   const auth = getAuth();
   const allActivitiesRef = collection(db, "activities");
   const myActivitiesRef = collection(db, "volunteerParticipation");
-  const userRef = doc(db, "volunteer", auth.currentUser.uid);
+  const userRef = doc(db, "volunteer", auth.currentUser?.uid);
 
   const [initializing, setInitializing] = React.useState(true);
   const [allActivity, setActivity] = React.useState([]);

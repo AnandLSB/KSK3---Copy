@@ -153,7 +153,14 @@ const ProfileScreen = () => {
         if (userDoc.data().myForums.length > 0) {
           userDoc.get("myForums").forEach((forumItem) => {
             messaging().unsubscribeFromTopic(forumItem);
-            console.log("Unsubscribed from " + forumItem);
+            console.log("Unsubscribed from forum " + forumItem);
+          });
+        }
+
+        if (userDoc.data().myActivities.length > 0) {
+          userDoc.get("myActivities").forEach((activityItem) => {
+            messaging().unsubscribeFromTopic(activityItem);
+            console.log("Unsubscribed from activity " + activityItem);
           });
         }
       })

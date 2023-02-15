@@ -34,7 +34,6 @@ const MyActivitiesScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const auth = getAuth();
-  const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = React.useState([]);
   const [activityInfo, setActivityInfo] = React.useState([]);
   const [hasActivity, setHasActivity] = React.useState(false);
@@ -42,54 +41,58 @@ const MyActivitiesScreen = () => {
   const [inactiveAct, setInactiveAct] = React.useState([]);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(userRef, (docMy) => {
-      setMyActivity([]);
-      setActivityInfo([]);
+    if (auth.currentUser !== null) {
+      const userRef = doc(db, "volunteer", auth.currentUser?.uid);
 
-      //If the user has joined any activities
-      if (docMy.data().myActivities.length > 0) {
-        setMyActivity(docMy.data().myActivities);
+      const unsubscribe = onSnapshot(userRef, (docMy) => {
+        setMyActivity([]);
+        setActivityInfo([]);
 
-        docMy.get("myActivities").forEach((item) => {
-          let docRef = doc(db, "activities", item);
-          var activity = {};
-          var dateTime, dateTimeEnd;
+        //If the user has joined any activities
+        if (docMy.data().myActivities.length > 0) {
+          setMyActivity(docMy.data().myActivities);
 
-          getDoc(docRef).then((docInf) => {
-            if (docInf.exists()) {
-              if (
-                docInf.data().activityStatus === "active" ||
-                docInf.data().activityStatus === "full"
-              ) {
-                dateTime = docInf.data().activityDatetime.toDate();
-                dateTimeEnd = docInf.data().activityDatetimeEnd.toDate();
+          docMy.get("myActivities").forEach((item) => {
+            let docRef = doc(db, "activities", item);
+            var activity = {};
+            var dateTime, dateTimeEnd;
 
-                activity = docInf.data();
-                activity.Id = docInf.id;
-                activity.activityDatetime = dateTime;
-                activity.activityDatetimeEnd = dateTimeEnd;
+            getDoc(docRef).then((docInf) => {
+              if (docInf.exists()) {
+                if (
+                  docInf.data().activityStatus === "active" ||
+                  docInf.data().activityStatus === "full"
+                ) {
+                  dateTime = docInf.data().activityDatetime.toDate();
+                  dateTimeEnd = docInf.data().activityDatetimeEnd.toDate();
 
-                setActivityInfo((activityInfo) =>
-                  Array.from(new Set([...activityInfo, activity]))
-                );
-              } else {
-                setInactiveAct((inactiveAct) =>
-                  Array.from(new Set([...inactiveAct, docInf.id]))
-                );
+                  activity = docInf.data();
+                  activity.Id = docInf.id;
+                  activity.activityDatetime = dateTime;
+                  activity.activityDatetimeEnd = dateTimeEnd;
+
+                  setActivityInfo((activityInfo) =>
+                    Array.from(new Set([...activityInfo, activity]))
+                  );
+                } else {
+                  setInactiveAct((inactiveAct) =>
+                    Array.from(new Set([...inactiveAct, docInf.id]))
+                  );
+                }
               }
-            }
+            });
           });
-        });
 
-        setHasActivity(true);
-      } else {
-        setHasActivity(false);
-      }
-    });
+          setHasActivity(true);
+        } else {
+          setHasActivity(false);
+        }
+      });
 
-    if (initializing) setInitializing(false);
+      if (initializing) setInitializing(false);
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    }
   }, []);
 
   //console.log(myActivity);

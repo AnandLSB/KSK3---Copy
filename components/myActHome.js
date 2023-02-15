@@ -68,8 +68,6 @@ const MyActHome = () => {
     return () => unsubscribe();
   }, []);
 
-  console.log(myActivity);
-
   /* In case you need it later; this is the code for checking if the activity is still ongoing or passed
   if (
     new Date().setHours(0, 0, 0, 0) <=
