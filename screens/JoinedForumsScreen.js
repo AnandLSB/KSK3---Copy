@@ -66,19 +66,21 @@ const JoinedForumsScreen = () => {
     for (let forum of joinedForums) {
       let docRef = doc(db, "forums", forum.id);
       const docInf = await getDoc(docRef);
-      const author = await getForumAuthor(docInf.data().createdBy);
+      if (docInf.exists()) {
+        const author = await getForumAuthor(docInf.data().createdBy);
 
-      joinedForumsData.push({
-        ...docInf.data(),
-        id: docInf.id,
-        createdBy: author,
-        createdAt: docInf
-          .data({ serverTimestamps: "estimate" })
-          .createdAt.toDate(),
-        updatedAt: docInf
-          .data({ serverTimestamps: "estimate" })
-          .updatedAt.toDate(),
-      });
+        joinedForumsData.push({
+          ...docInf.data(),
+          id: docInf.id,
+          createdBy: author,
+          createdAt: docInf
+            .data({ serverTimestamps: "estimate" })
+            .createdAt.toDate(),
+          updatedAt: docInf
+            .data({ serverTimestamps: "estimate" })
+            .updatedAt.toDate(),
+        });
+      }
     }
 
     return joinedForumsData;

@@ -89,7 +89,7 @@ const DiscoverForumsScreen = () => {
     if (loading) setLoading(false);
 
     return () => unsubscribe();
-  }, [isFocused]);
+  }, []);
 
   forums?.sort((a, b) => {
     return b.createdAt - a.createdAt;
