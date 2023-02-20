@@ -91,8 +91,6 @@ const HomeScreen = () => {
     );
   }
 
-  //TODO: Handle if current date > activity date; Activity has already been held
-
   return (
     <View style={styles.container}>
       <View style={styles.section}>
@@ -121,32 +119,38 @@ const HomeScreen = () => {
         data={allActivity}
         style={{ flexGrow: 0, height: "45%" }}
         renderItem={({ item }) => (
-          <Card>
-            <View style={styles.infoCont}>
-              <Text style={{ fontWeight: "bold" }}>
-                {capitalizeWords(item.activityName)}
-              </Text>
-              <Text>
-                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetime, "p")}
-              </Text>
-              <Text>
-                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetimeEnd, "p")}
-              </Text>
-              <Text>Volunteer Slots: {item.volunteerSlot}</Text>
-              <Text>Category: {item.activityCategory}</Text>
-            </View>
-            <View style={styles.buttonCont}>
-              <TouchableOpacity
-                onPress={() => {
-                  joinActivity(item.id, item);
-                }}
-              >
-                <Text style={styles.buttonOutlineText}>Join</Text>
-              </TouchableOpacity>
-            </View>
-          </Card>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate("ActivityInfo", { activityId: item.id });
+            }}
+          >
+            <Card>
+              <View style={styles.infoCont}>
+                <Text style={{ fontWeight: "bold" }}>
+                  {capitalizeWords(item.activityName)}
+                </Text>
+                <Text>
+                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetime, "p")}
+                </Text>
+                <Text>
+                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetimeEnd, "p")}
+                </Text>
+                <Text>Volunteer Slots: {item.volunteerSlot}</Text>
+                <Text>Category: {item.activityCategory}</Text>
+              </View>
+              <View style={styles.buttonCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    joinActivity(item.id, item);
+                  }}
+                >
+                  <Text style={styles.buttonOutlineText}>Join</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          </TouchableOpacity>
         )}
       />
     </View>

@@ -13,7 +13,14 @@ import {
   Image,
 } from "react-native";
 import { auth } from "../config/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import React, { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { db } from "../config/firebase";
@@ -52,20 +59,29 @@ const LoginScreen = () => {
   };
 
   const handleSignIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then(() => {
-        subscribeForums(auth.currentUser.uid);
-        subscribeActivities(auth.currentUser.uid);
-      })
-      .catch((error) => {
-        if (error.code === "auth/user-not-found") {
-          Alert.alert("Error!", "User not found");
-        } else if (error.code === "auth/wrong-password") {
-          Alert.alert("Error!", "Wrong password");
-        } else {
-          alert(error.message);
-        }
-      });
+    const collectionRef = collection(db, "volunteer");
+    const q = query(collectionRef, where("email", "==", email.toLowerCase()));
+
+    getDocs(q).then((snapshot) => {
+      if (snapshot.docs.length === 0) {
+        Alert.alert("Error!", "User not found");
+      } else {
+        signInWithEmailAndPassword(auth, email, password)
+          .then(() => {
+            subscribeForums(auth.currentUser.uid);
+            subscribeActivities(auth.currentUser.uid);
+          })
+          .catch((error) => {
+            if (error.code === "auth/user-not-found") {
+              Alert.alert("Error!", "User not found");
+            } else if (error.code === "auth/wrong-password") {
+              Alert.alert("Error!", "Wrong password");
+            } else {
+              alert(error.message);
+            }
+          });
+      }
+    });
   };
 
   const handlePassReset = () => {
@@ -75,6 +91,13 @@ const LoginScreen = () => {
       })
       .catch((error) => {
         alert(error.message);
+        if (error.code === "auth/invalid-email") {
+          Alert.alert("Error!", "Invalid email");
+        } else if (error.code === "auth/user-not-found") {
+          Alert.alert("Error!", "User not found");
+        } else {
+          alert(error.message);
+        }
       });
   };
 

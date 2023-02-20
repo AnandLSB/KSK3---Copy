@@ -5,8 +5,6 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
-  StatusBar,
-  Button,
 } from "react-native";
 import React, { useState } from "react";
 import {
@@ -45,8 +43,6 @@ const RegisterExtScreen = ({ route }) => {
   const [kskLocation, setKskLocation] = useState("");
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [date, setDate] = useState("Birthdate");
-
-  const [selected, setSelected] = React.useState("");
 
   const nationalityData = [
     { key: "1", value: "Malaysian" },
@@ -129,6 +125,7 @@ const RegisterExtScreen = ({ route }) => {
       Username: name,
       fullName: fullName,
       icNumber: icNumber,
+      email: email.toLowerCase(),
       phoneNumber: phoneNumber,
       nationality: nationality,
       birthdate: Timestamp.fromDate(birthdate),

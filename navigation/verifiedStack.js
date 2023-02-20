@@ -12,12 +12,10 @@ import Test from "../screens/test";
 import HomeScreen from "../screens/HomeScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 import JoinedForumsScreen from "../screens/JoinedForumsScreen";
-import ForumScreen from "../screens/ForumScreen"; //Old Screen
 import EditProfileScreen from "../screens/EditProfileScreen";
 import EditPasswordScreen from "../screens/EditPasswordScreen";
 import AllActivitiesScreen from "../screens/AllActivitiesScreen";
 import MyActivitiesScreen from "../screens/MyActivitiesScreen";
-import AllForumsScreen from "../screens/AllForumsScreen"; //Old Screen
 import CreatedForumsScreen from "../screens/CreatedForumsScreen";
 import BeneFormScreen from "../screens/BeneFormScreen";
 import ScanScreen from "../screens/ScanScreen";
@@ -25,6 +23,7 @@ import PostScanScreen from "../screens/PostScanScreen";
 import CompletedActivitiesScreen from "../screens/CompletedActivitiesScreen";
 import ForumScreen2 from "../screens/ForumScreen2";
 import DiscoverForumsScreen from "../screens/DiscoverForumsScreen";
+import ActivityInfoScreen from "../screens/ActivityInfoScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -220,6 +219,17 @@ const VerifiedStack = () => {
           component={CompletedActivitiesScreen}
           options={{
             headerTitle: "Completed Activities",
+            headerTitleAlign: "center",
+            headerTitleStyle: { color: "white", fontSize: 18 },
+            headerStyle: { backgroundColor: "#e55039" },
+            headerTintColor: "white",
+          }}
+        />
+        <Stack.Screen
+          name={"ActivityInfo"}
+          component={ActivityInfoScreen}
+          options={{
+            headerTitle: "Activity Information",
             headerTitleAlign: "center",
             headerTitleStyle: { color: "white", fontSize: 18 },
             headerStyle: { backgroundColor: "#e55039" },

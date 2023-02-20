@@ -60,7 +60,7 @@ const VerifyEmailScreen = () => {
           <Text style={{ color: "black", fontWeight: "bold" }}>
             Resend Verification Email
           </Text>{" "}
-          button to resend the verification email
+          button to resend the verification email after 60 seconds.
         </Text>
       </View>
       <View style={styles.buttonContainer}>

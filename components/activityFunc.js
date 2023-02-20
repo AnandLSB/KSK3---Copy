@@ -194,13 +194,15 @@ async function checkClash(item) {
 }
 
 const capitalizeWords = (activityName) => {
-  return activityName
-    .toLowerCase()
-    .split(" ")
-    .map((word) => {
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    })
-    .join(" ");
+  if (activityName !== undefined) {
+    return activityName
+      .toLowerCase()
+      .split(" ")
+      .map((word) => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+      })
+      .join(" ");
+  }
 };
 
 export { joinActivity, leaveActivity, checkClash, capitalizeWords };

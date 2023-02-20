@@ -63,19 +63,15 @@ const EditPasswordScreen = () => {
     <View style={styles.container}>
       <View style={{ margin: 10, marginBottom: 40 }}>
         <Text style={{ fontWeight: "500", fontSize: 16, textAlign: "center" }}>
-          Edit your account password or email in the fields below!
+          Please input your current password to reauthenticate, then edit your
+          account password or email in the fields below!
         </Text>
       </View>
 
       <View style={styles.inputContainer}>
-        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Email</Text>
-        <TextInput
-          placeholder={email}
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
-        />
-        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Password</Text>
+        <Text style={{ padding: 5, fontWeight: "500" }}>
+          Input Current Password
+        </Text>
         <TextInput
           placeholder="Current Password"
           value={currPassword}
@@ -88,6 +84,14 @@ const EditPasswordScreen = () => {
           style={styles.input}
           secureTextEntry
         />
+        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Email</Text>
+        <TextInput
+          placeholder={email}
+          value={email}
+          onChangeText={(text) => setEmail(text)}
+          style={styles.input}
+        />
+        <Text style={{ padding: 5, fontWeight: "500" }}>Edit Password</Text>
         <TextInput
           placeholder="New Password"
           value={newPassword}
@@ -114,6 +118,11 @@ const EditPasswordScreen = () => {
               Alert.alert("Error!", "Please enter a valid email");
             } else if (email === auth.currentUser?.email) {
               Alert.alert("Error!", "Please enter a new email");
+            } else if (currPassword === "") {
+              Alert.alert(
+                "Error!",
+                "Please enter current password to reauthenticate"
+              );
             } else {
               handleUpdateEmail();
             }
@@ -124,14 +133,17 @@ const EditPasswordScreen = () => {
         <TouchableOpacity
           style={[styles.button, styles.buttonOutline]}
           onPress={() => {
-            if (
-              currPassword === "" ||
-              newPassword === "" ||
-              confirmNewPassword === ""
-            ) {
+            if (newPassword === "" || confirmNewPassword === "") {
               Alert.alert("Error!", "Please fill in all fields");
             } else if (newPassword !== confirmNewPassword) {
               Alert.alert("Error!", "New passwords do not match");
+            } else if (newPassword.length < 6) {
+              Alert.alert("Error!", "Password must be at least 6 characters");
+            } else if (currPassword === "") {
+              Alert.alert(
+                "Error!",
+                "Please enter current password to reauthenticate"
+              );
             } else {
               handleUpdatePassword();
             }
