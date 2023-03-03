@@ -167,7 +167,7 @@ async function checkClash(item) {
           "Clashing Schedules Found!",
           "The " +
             activitySnap.data().activityName +
-            " activity is on the same date as the requested activity!"
+            " activity is on the same date!"
         );
         break;
       } else if (

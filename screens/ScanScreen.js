@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { db } from "../config/firebase";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, StackActions } from "@react-navigation/native";
 
 const ScanScreen = ({ route }) => {
   const activityId = route.params.activityId;
@@ -44,6 +44,7 @@ const ScanScreen = ({ route }) => {
     } else {
       //Invalid QR code for the respective activity
       Alert.alert("Invalid QR code for this activity!");
+      navigation.dispatch(StackActions.pop(1));
     }
   };
 
