@@ -20,7 +20,6 @@ const MyActHome = () => {
   const navigation = useNavigation();
   const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [myActivity, setMyActivity] = useState([]);
-  const [hasActivity, setHasActivity] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(userRef, (docMy) => {
@@ -54,38 +53,11 @@ const MyActHome = () => {
             }
           });
         });
-
-        setHasActivity(true);
-      } else if (myActivity.length === 0) {
-        //If the activity array is empty
-        setHasActivity(false);
-      } else {
-        //If the user has not joined any activities
-        setHasActivity(false);
       }
     });
 
     return () => unsubscribe();
   }, []);
-
-  /* In case you need it later; this is the code for checking if the activity is still ongoing or passed
-  if (
-    new Date().setHours(0, 0, 0, 0) <=
-    docInf.data().activityDatetime.toDate().setHours(0, 0, 0, 0)
-  ) {
-    dateTime = docInf.data().activityDatetime.toDate();
-
-    activity = docInf.data();
-    activity.id = docInf.id;
-    activity.activityDatetime = dateTime;
-
-    setMyActivity((myActivity) =>
-      Array.from(new Set([...myActivity, activity]))
-    );
-  } else {
-    console.log("Activity is over" + docInf.data().activityName);
-  }
-  */
 
   //Checking if the activity date is today
   const checkActivityDate = (activityId, activityDatetime) => {
@@ -121,46 +93,44 @@ const MyActHome = () => {
     return a.activityDatetime - b.activityDatetime;
   });
 
-  if (hasActivity === false) {
-    return (
-      <Card>
-        <Text>No upcoming activities</Text>
-      </Card>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <FlatList
-        data={myActivity}
-        renderItem={({ item }) => (
-          <Card>
-            <View>
-              <Text style={{ fontWeight: "bold" }}>
-                {capitalizeWords(item.activityName)}
-              </Text>
-              <Text>
-                Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetime, "p")}
-              </Text>
-              <Text>
-                End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
-                {format(item.activityDatetimeEnd, "p")}
-              </Text>
-              <Text>Category: {item.activityCategory}</Text>
-            </View>
-            <View style={styles.buttonCont}>
-              <TouchableOpacity
-                onPress={() => {
-                  checkSession(item.id, item.activityDatetime);
-                }}
-              >
-                <Text style={styles.buttonOutlineText}>Check In</Text>
-              </TouchableOpacity>
-            </View>
-          </Card>
-        )}
-      />
+      {myActivity.length > 0 ? (
+        <FlatList
+          data={myActivity}
+          renderItem={({ item }) => (
+            <Card>
+              <View>
+                <Text style={{ fontWeight: "bold" }}>
+                  {capitalizeWords(item.activityName)}
+                </Text>
+                <Text>
+                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetime, "p")}
+                </Text>
+                <Text>
+                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                  {format(item.activityDatetimeEnd, "p")}
+                </Text>
+                <Text>Category: {item.activityCategory}</Text>
+              </View>
+              <View style={styles.buttonCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    checkSession(item.id, item.activityDatetime);
+                  }}
+                >
+                  <Text style={styles.buttonOutlineText}>Check In</Text>
+                </TouchableOpacity>
+              </View>
+            </Card>
+          )}
+        />
+      ) : (
+        <Card>
+          <Text>No Upcoming Activities</Text>
+        </Card>
+      )}
     </View>
   );
 };
