@@ -34,6 +34,7 @@ const MyActivitiesScreen = () => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
   const auth = getAuth();
+  const userRef = doc(db, "volunteer", auth.currentUser?.uid);
   const [myActivity, setMyActivity] = React.useState([]);
   const [activityInfo, setActivityInfo] = React.useState([]);
   const [initializing, setInitializing] = React.useState(true);
