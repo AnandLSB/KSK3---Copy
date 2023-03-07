@@ -1,5 +1,5 @@
 import { useNavigation } from "@react-navigation/core";
-import { getAuth, signOut } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import React, { useEffect } from "react";
 import {
   StyleSheet,
@@ -13,16 +13,9 @@ import {
   collection,
   query,
   where,
-  getDocs,
   orderBy,
-  documentId,
-  updateDoc,
-  arrayUnion,
-  increment,
   doc,
   onSnapshot,
-  startAt,
-  endAt,
 } from "firebase/firestore";
 import { db } from "../config/firebase";
 import Card from "../components/card";
@@ -32,16 +25,15 @@ import {
   checkClash,
   capitalizeWords,
 } from "../components/activityFunc";
-import { search, SearchBar } from "../components/search";
+import { SearchBar } from "../components/search";
 
 const AllActivitiesScreen = () => {
   console.log("AllActivitiesScreen");
   const auth = getAuth();
+  const navigation = useNavigation();
   const activitiesRef = collection(db, "activities");
-  const userRef = doc(db, "volunteer", auth.currentUser.uid);
   const [activities, setActivities] = React.useState([]);
   const [initializing, setInitializing] = React.useState(true);
-  const [searchText, setSearchText] = React.useState("");
 
   useEffect(() => {
     const q = query(
@@ -70,45 +62,6 @@ const AllActivitiesScreen = () => {
     return () => unsubscribe();
   }, []);
 
-  /*
-  const getAllActivities = async () => {
-    const q = query(
-      activitiesRef,
-      where("activityStatus", "==", "active"),
-      orderBy("activityName", "asc")
-    );
-    const querySnapshot = await getDocs(q);
-    const activity = [];
-    var dateTime;
-    querySnapshot.forEach((doc) => {
-      dateTime = doc.data().activityDatetime.toDate();
-      const {
-        activityCategory,
-        activityDesc,
-        activityName,
-        createdAt,
-        volunteerSlot,
-      } = doc.data();
-
-      activity.push({
-        id: doc.id,
-        activityCategory,
-        activityDatetime: dateTime,
-        activityDesc,
-        activityName,
-        createdAt,
-        volunteerSlot,
-      });
-
-      setActivities(activity);
-    });
-
-    if (initializing) setInitializing(false);
-  };
-  */
-
-  console.log(activities);
-
   if (initializing) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -116,8 +69,6 @@ const AllActivitiesScreen = () => {
       </View>
     );
   }
-
-  console.log(searchText);
 
   return (
     <View style={styles.container}>
@@ -131,32 +82,38 @@ const AllActivitiesScreen = () => {
         <FlatList
           data={activities}
           renderItem={({ item }) => (
-            <Card>
-              <View style={styles.infoCont}>
-                <Text style={{ fontWeight: "bold" }}>
-                  {capitalizeWords(item.activityName)}
-                </Text>
-                <Text>
-                  Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
-                  {format(item.activityDatetime, "p")}
-                </Text>
-                <Text>
-                  End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
-                  {format(item.activityDatetimeEnd, "p")}
-                </Text>
-                <Text>Volunteer Slots: {item.volunteerSlot}</Text>
-                <Text>Category: {item.activityCategory}</Text>
-              </View>
-              <View style={styles.buttonCont}>
-                <TouchableOpacity
-                  onPress={() => {
-                    joinActivity(item.id, item);
-                  }}
-                >
-                  <Text style={styles.buttonOutlineText}>Join</Text>
-                </TouchableOpacity>
-              </View>
-            </Card>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("ActivityInfo", { activityId: item.id });
+              }}
+            >
+              <Card>
+                <View style={styles.infoCont}>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {capitalizeWords(item.activityName)}
+                  </Text>
+                  <Text>
+                    Start: {format(item.activityDatetime, "dd MMM yyyy")} at{" "}
+                    {format(item.activityDatetime, "p")}
+                  </Text>
+                  <Text>
+                    End: {format(item.activityDatetimeEnd, "dd MMM yyyy")} at{" "}
+                    {format(item.activityDatetimeEnd, "p")}
+                  </Text>
+                  <Text>Volunteer Slots: {item.volunteerSlot}</Text>
+                  <Text>Category: {item.activityCategory}</Text>
+                </View>
+                <View style={styles.buttonCont}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      joinActivity(item.id, item);
+                    }}
+                  >
+                    <Text style={styles.buttonOutlineText}>Join</Text>
+                  </TouchableOpacity>
+                </View>
+              </Card>
+            </TouchableOpacity>
           )}
         />
       )}

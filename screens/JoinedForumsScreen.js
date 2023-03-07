@@ -54,6 +54,7 @@ const JoinedForumsScreen = () => {
         });
       } else {
         setJoinedForums(null);
+        if (loading) setLoading(false);
       }
     });
 

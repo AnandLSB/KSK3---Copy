@@ -122,7 +122,7 @@ const RegisterExtScreen = ({ route }) => {
     }
 
     await setDoc(doc(db, "volunteer", auth.currentUser.uid), {
-      Username: name,
+      Username: name.toLowerCase(),
       fullName: fullName,
       icNumber: icNumber,
       email: email.toLowerCase(),

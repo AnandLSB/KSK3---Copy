@@ -162,22 +162,14 @@ async function checkClash(item) {
 
       let activityDate = activitySnap.data().activityDatetime;
 
-      if (activityDate.isEqual(requestedDate)) {
-        Alert.alert(
-          "Clashing Schedules Found!",
-          "The " +
-            activitySnap.data().activityName +
-            " activity is on the same date!"
-        );
-        break;
-      } else if (
-        activityDate < requestedDate &&
-        activitySnap.data().activityDatetimeEnd > requestedDate
+      if (
+        activityDate <= requestedDate &&
+        activitySnap.data().activityDatetimeEnd >= requestedDate
       ) {
         Alert.alert(
           "Clashing Schedules Found!",
           "The " +
-            activitySnap.data().activityName +
+            capitalizeWords(activitySnap.data().activityName) +
             " activity takes place at the same time as the requested activity!"
         );
         break;

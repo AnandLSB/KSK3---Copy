@@ -77,7 +77,7 @@ const HomeScreen = () => {
         setActivity((allActivity) => [...allActivity, allAct]);
       });
     });
-    //TODO: Handle if the admin has not created any activities yet
+
     if (initializing) setInitializing(false);
 
     return () => unsubscribe();

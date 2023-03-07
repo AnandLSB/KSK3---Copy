@@ -36,7 +36,6 @@ const MyActivitiesScreen = () => {
   const auth = getAuth();
   const [myActivity, setMyActivity] = React.useState([]);
   const [activityInfo, setActivityInfo] = React.useState([]);
-  const [hasActivity, setHasActivity] = React.useState(false);
   const [initializing, setInitializing] = React.useState(true);
   const [inactiveAct, setInactiveAct] = React.useState([]);
 
@@ -82,10 +81,6 @@ const MyActivitiesScreen = () => {
               }
             });
           });
-
-          setHasActivity(true);
-        } else {
-          setHasActivity(false);
         }
       });
 
@@ -94,9 +89,6 @@ const MyActivitiesScreen = () => {
       return () => unsubscribe();
     }
   }, []);
-
-  //console.log(myActivity);
-  //console.log(activityInfo);
 
   if (isFocused) {
     if (inactiveAct.length > 0) {
@@ -139,8 +131,6 @@ const MyActivitiesScreen = () => {
     );
   });
 
-  //console.log(activityInfo);
-
   return (
     <View style={styles.container}>
       <View style={[styles.section, { justifyContent: "space-between" }]}>
@@ -158,7 +148,7 @@ const MyActivitiesScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {hasActivity ? (
+      {activityInfo.length > 0 ? (
         <FlatList
           data={activityInfo}
           renderItem={({ item }) => (
@@ -180,7 +170,6 @@ const MyActivitiesScreen = () => {
                 <TouchableOpacity
                   onPress={() => {
                     leaveActivity(item.Id);
-                    //setActivityInfo([]);
                   }}
                 >
                   <Text style={styles.buttonOutlineText}>Cancel</Text>
