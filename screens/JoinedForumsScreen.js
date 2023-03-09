@@ -94,7 +94,11 @@ const JoinedForumsScreen = () => {
       const userRef = doc(db, "volunteer", userID);
 
       await getDoc(userRef).then((userDoc) => {
-        author = userDoc.data().Username;
+        if (userDoc.exists()) {
+          author = userDoc.data().Username;
+        } else {
+          author = "Unknown";
+        }
       });
     } else {
       author = "You";
@@ -171,9 +175,11 @@ const JoinedForumsScreen = () => {
             >
               <Card>
                 <View>
-                  <Text>Title: {capitalizeWords(item.title)}</Text>
-                  <Text>Desc: {item.desc}</Text>
-                  <Text>Created By: {item.createdBy}</Text>
+                  <Text style={{ fontWeight: "bold" }}>
+                    {capitalizeWords(item.title)}
+                  </Text>
+                  <Text>{item?.desc}</Text>
+                  <Text>Created by: {item.createdBy}</Text>
                 </View>
                 {/* Maybe add a recent message component onSnapshot for each forum */}
                 <TouchableOpacity

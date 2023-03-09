@@ -66,7 +66,11 @@ const AllForumsScreen = () => {
         if (docFor.data().createdBy === auth.currentUser.uid) {
           forum.createdBy = "You";
         } else {
-          forum.createdBy = userInfo.data().Username;
+          if (userInfo.exists()) {
+            forum.createdBy = userInfo.data().Username;
+          } else {
+            forum.createdBy = "Unknown";
+          }
         }
 
         forum.createdAt = docFor

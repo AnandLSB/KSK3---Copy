@@ -89,7 +89,7 @@ const DiscoverForumsScreen = () => {
     if (loading) setLoading(false);
 
     return () => unsubscribe();
-  }, []);
+  }, [isFocused]);
 
   forums?.sort((a, b) => {
     return b.createdAt - a.createdAt;
@@ -102,7 +102,11 @@ const DiscoverForumsScreen = () => {
       const userRef = doc(db, "volunteer", userID);
 
       await getDoc(userRef).then((userDoc) => {
-        author = userDoc.data().Username;
+        if (userDoc.exists()) {
+          author = userDoc.data().Username;
+        } else {
+          author = "Unknown";
+        }
       });
     } else {
       author = "You";
@@ -134,6 +138,7 @@ const DiscoverForumsScreen = () => {
             joinForum(props.forumId);
             navigation.navigate("ForumDetails", {
               forumId: props.forumId,
+              createdBy: props.createdBy,
             });
           }}
         >
@@ -181,7 +186,9 @@ const DiscoverForumsScreen = () => {
                   <Text>Created by: {item.createdBy}</Text>
                 </View>
                 <View style={styles.buttonCont}>
-                  {item.joined ? null : <JoinButton forumId={item.id} />}
+                  {item.joined ? null : (
+                    <JoinButton forumId={item.id} createdBy={item.createdBy} />
+                  )}
                 </View>
               </Card>
             </TouchableOpacity>
