@@ -15,12 +15,15 @@ import {
   updateEmail,
 } from "firebase/auth";
 import { useNavigation, StackActions } from "@react-navigation/native";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../config/firebase";
 
 const EditPasswordScreen = () => {
   const auth = getAuth();
   const user = auth.currentUser;
   const [currPassword, setCurrPassword] = React.useState("");
   const [newPassword, setNewPassword] = React.useState("");
+  const [reauthenticated, setReauthenticated] = React.useState(false);
   const [confirmNewPassword, setConfirmNewPassword] = React.useState("");
   const [email, setEmail] = React.useState(auth.currentUser?.email);
   const navigation = useNavigation();
@@ -29,22 +32,30 @@ const EditPasswordScreen = () => {
   const credential = EmailAuthProvider.credential(user.email, currPassword);
 
   const reauthenticateUser = () => {
-    reauthenticateWithCredential(user, credential).catch(() => {
-      Alert.alert(
-        "Incorrect Current Password",
-        "Please Re-enter Current Password"
-      );
-    });
+    reauthenticateWithCredential(user, credential)
+      .then(() => {
+        Alert.alert(
+          "Reauthentication Successful",
+          "You may proceed to edit your email or password!"
+        );
+        setReauthenticated(true);
+      })
+      .catch(() => {
+        Alert.alert(
+          "Incorrect Current Password",
+          "Please Re-enter Current Password"
+        );
+      });
   };
 
   const handleUpdatePassword = () => {
     updatePassword(user, newPassword)
-      .catch(() => {
-        Alert.alert("Error", "Failed to update password");
-      })
       .then(() => {
         Alert.alert("Success", "Password updated successfully");
         navigation.dispatch(StackActions.pop(1));
+      })
+      .catch(() => {
+        Alert.alert("Error", "Failed to update password");
       });
   };
 
@@ -52,6 +63,12 @@ const EditPasswordScreen = () => {
     updateEmail(user, email)
       .catch(() => {
         Alert.alert("Error", "Failed to update email");
+      })
+      .then(() => {
+        const userRef = doc(db, "volunteer", user.uid);
+        updateDoc(userRef, {
+          email: email,
+        });
       })
       .then(() => {
         Alert.alert("Success", "Email updated successfully");
@@ -124,7 +141,14 @@ const EditPasswordScreen = () => {
                 "Please enter current password to reauthenticate"
               );
             } else {
-              handleUpdateEmail();
+              if (reauthenticated === true) {
+                handleUpdateEmail();
+              } else {
+                Alert.alert(
+                  "Unsuccessful Reauthentication",
+                  "Please enter current password to reauthenticate"
+                );
+              }
             }
           }}
         >
@@ -145,7 +169,14 @@ const EditPasswordScreen = () => {
                 "Please enter current password to reauthenticate"
               );
             } else {
-              handleUpdatePassword();
+              if (reauthenticated === true) {
+                handleUpdatePassword();
+              } else {
+                Alert.alert(
+                  "Unsuccessful Reauthentication",
+                  "Please enter current password to reauthenticate"
+                );
+              }
             }
           }}
         >

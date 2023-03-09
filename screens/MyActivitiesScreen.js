@@ -41,17 +41,14 @@ const MyActivitiesScreen = () => {
   const [inactiveAct, setInactiveAct] = React.useState([]);
 
   useEffect(() => {
-    if (auth.currentUser !== null) {
+    if (auth.currentUser !== undefined && auth.currentUser !== null) {
       const userRef = doc(db, "volunteer", auth.currentUser?.uid);
 
       const unsubscribe = onSnapshot(userRef, (docMy) => {
-        setMyActivity([]);
         setActivityInfo([]);
 
         //If the user has joined any activities
         if (docMy.data().myActivities.length > 0) {
-          setMyActivity(docMy.data().myActivities);
-
           docMy.get("myActivities").forEach((item) => {
             let docRef = doc(db, "activities", item);
             var activity = {};

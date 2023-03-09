@@ -109,64 +109,69 @@ const CreatedForumsScreen = () => {
           Your Created Forums:
         </Text>
       </View>
+      {myforums.length > 0 ? (
+        <FlatList
+          data={myforums}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("ForumDetails", {
+                  forumId: item.id,
+                  forumTitle: item.title,
+                  createdBy: item.createdBy,
+                });
+              }}
+            >
+              <Card>
+                <View>
+                  <Text>Title: {capitalizeWords(item.title)}</Text>
+                  <Text>Desc: {item.desc}</Text>
+                  <Text>Created By: {item.createdBy}</Text>
+                </View>
+                <View style={styles.buttonCont}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      setForumId(item.id);
+                      setNewTitle(item.title);
+                      setNewDesc(item.desc);
+                      setModalVisible(true);
+                    }}
+                  >
+                    <Text style={{ paddingBottom: 3 }}>Edit</Text>
+                  </TouchableOpacity>
 
-      <FlatList
-        data={myforums}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("ForumDetails", {
-                forumId: item.id,
-                forumTitle: item.title,
-                createdBy: item.createdBy,
-              });
-            }}
-          >
-            <Card>
-              <View>
-                <Text>Title: {capitalizeWords(item.title)}</Text>
-                <Text>Desc: {item.desc}</Text>
-                <Text>Created By: {item.createdBy}</Text>
-              </View>
-              <View style={styles.buttonCont}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setForumId(item.id);
-                    setNewTitle(item.title);
-                    setNewDesc(item.desc);
-                    setModalVisible(true);
-                  }}
-                >
-                  <Text style={{ paddingBottom: 3 }}>Edit</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => {
-                    Alert.alert(
-                      "Delete Forum",
-                      "Are you sure you want to delete this forum?",
-                      [
-                        {
-                          text: "Cancel",
-                        },
-                        {
-                          text: "OK",
-                          onPress: () => deleteForum(item.id),
-                        },
-                      ],
-                      { cancelable: true }
-                    );
-                  }}
-                >
-                  <Text style={{ color: "#e55039", paddingTop: 3 }}>
-                    Delete
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </Card>
-          </TouchableOpacity>
-        )}
-      />
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        "Delete Forum",
+                        "Are you sure you want to delete this forum?",
+                        [
+                          {
+                            text: "Cancel",
+                          },
+                          {
+                            text: "OK",
+                            onPress: () => deleteForum(item.id),
+                          },
+                        ],
+                        { cancelable: true }
+                      );
+                    }}
+                  >
+                    <Text style={{ color: "#e55039", paddingTop: 3 }}>
+                      Delete
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </Card>
+            </TouchableOpacity>
+          )}
+        />
+      ) : (
+        <Card>
+          <Text>No forums created yet</Text>
+        </Card>
+      )}
     </View>
   );
 };

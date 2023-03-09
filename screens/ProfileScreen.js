@@ -47,35 +47,28 @@ const ProfileScreen = () => {
     password
   );
 
-  async function getUser() {
-    onSnapshot(docRef, (doc) => {
+  useEffect(() => {
+    const userRef = doc(db, "volunteer", auth.currentUser?.uid);
+    const unsubscribe = onSnapshot(userRef, (doc) => {
       setUser({
         ...doc.data(),
         birthdate: doc.data().birthdate.toDate(),
       });
       if (initializing) setInitializing(false);
     });
-  }
 
-  useEffect(() => {
-    getUser();
+    return unsubscribe;
   }, []);
 
   const handleDelete = async () => {
     setInitializing(true);
-    await deleteDoc(docRef)
-      .catch((error) => alert(error.message))
-      .then(() => {
-        deleteUser(getAuth().currentUser)
-          .catch((error) => alert(error.message))
-          .then(() => {
-            Alert.alert("Account Deleted", "Your account has been deleted");
-          });
-      });
+    const user = auth.currentUser;
 
     deleteUser(getAuth().currentUser)
       .catch((error) => alert(error.message))
-      .then(() => {
+      .then(async () => {
+        const deleteUser = doc(db, "volunteer", user.uid);
+        await deleteDoc(deleteUser);
         Alert.alert("Account Deleted", "Your account has been deleted");
       });
   };
@@ -237,7 +230,11 @@ const ProfileScreen = () => {
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Birthdate</Text>
             <View style={styles.infoCont}>
-              <Text>{format(user?.birthdate, "dd MMM yyyy")}</Text>
+              <Text>
+                {!user.birthdate
+                  ? null
+                  : format(user?.birthdate, "dd MMM yyyy")}
+              </Text>
             </View>
           </View>
           <View style={{ padding: 5 }}>

@@ -12,7 +12,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { getAuth } from "firebase/auth";
 import { useNavigation, StackActions } from "@react-navigation/native";
-import { format } from "date-fns";
+import { SelectList } from "react-native-dropdown-select-list";
 
 const EditProfileScreen = ({ route }) => {
   const auth = getAuth();
@@ -28,6 +28,10 @@ const EditProfileScreen = ({ route }) => {
   const [kskLocation, setKskLocation] = useState(user.kskLocation);
   const [nationality, setNationality] = useState(user.nationality);
   const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber);
+  const nationalityData = [
+    { key: "1", value: "Malaysian" },
+    { key: "2", value: "Non-Malaysian" },
+  ];
 
   const handleUpdate = async () => {
     await updateDoc(docRef, {
@@ -97,21 +101,34 @@ const EditProfileScreen = ({ route }) => {
           </View>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>KSK Location</Text>
-            <TextInput
-              placeholder={user.kskLocation}
-              value={kskLocation}
-              onChangeText={(text) => setKskLocation(text)}
-              style={styles.input}
+            <SelectList
+              placeholder={
+                <Text style={{ color: "#808080" }}>{user.kskLocation}</Text>
+              }
+              setSelected={(val) => {
+                setKskLocation(val);
+              }}
+              search={false}
+              data={[{ key: "1", value: "Selangor" }]}
+              save="value"
+              boxStyles={{ backgroundColor: "white", marginTop: 5 }}
+              dropdownStyles={{ backgroundColor: "white" }}
             />
           </View>
           <View style={{ padding: 5 }}>
             <Text style={{ fontWeight: "bold" }}>Nationality</Text>
-
-            <TextInput
-              placeholder={user.nationality}
-              value={nationality}
-              onChangeText={(text) => setNationality(text)}
-              style={styles.input}
+            <SelectList
+              placeholder={
+                <Text style={{ color: "#808080" }}>{user.nationality}</Text>
+              }
+              setSelected={(val) => {
+                setNationality(val);
+              }}
+              search={false}
+              data={nationalityData}
+              save="value"
+              boxStyles={{ backgroundColor: "white", marginTop: 5 }}
+              dropdownStyles={{ backgroundColor: "white" }}
             />
           </View>
         </ScrollView>

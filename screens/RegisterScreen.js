@@ -1,32 +1,15 @@
 import {
-  KeyboardAvoidingView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
   Alert,
-  ScrollView,
   Image,
 } from "react-native";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  sendEmailVerification,
-  fetchSignInMethodsForEmail,
-} from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import React, { useState } from "react";
-import {
-  collection,
-  addDoc,
-  setDoc,
-  doc,
-  getDoc,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { db } from "../config/firebase";
 
