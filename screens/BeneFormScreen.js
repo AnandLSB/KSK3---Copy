@@ -28,8 +28,8 @@ const BeneFormScreen = () => {
     const beneRef = collection(db, "foodBankBeneficiary");
 
     const docRef = await addDoc(beneRef, {
-      firstName: firstName,
-      lastName: lastName,
+      firstName: firstName.toLowerCase(),
+      lastName: lastName.toLowerCase(),
       category: category,
       houseAddress: houseAddress,
       noOfFamilyMembers: noOfFamilyMembers,
