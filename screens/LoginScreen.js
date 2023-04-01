@@ -90,7 +90,6 @@ const LoginScreen = () => {
         Alert.alert("Password Reset Email Sent!", "Please check your email");
       })
       .catch((error) => {
-        alert(error.message);
         if (error.code === "auth/invalid-email") {
           Alert.alert("Error!", "Invalid email");
         } else if (error.code === "auth/user-not-found") {
