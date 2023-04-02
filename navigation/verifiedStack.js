@@ -112,7 +112,7 @@ function Tabs() {
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name="Account"
         component={TabsTop}
         options={{
           headerTitle: "",
