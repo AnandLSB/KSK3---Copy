@@ -9,7 +9,7 @@ const ReportDialog = (props) => {
   return (
     <View>
       <Dialog.Container visible={props.visible}>
-        <Dialog.Title>Report the respective Forum</Dialog.Title>
+        <Dialog.Title>Report the Respective Forum</Dialog.Title>
         <Dialog.Description>
           Please provide your reason for reporting
         </Dialog.Description>
